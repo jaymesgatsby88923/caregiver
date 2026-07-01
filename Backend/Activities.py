@@ -55,7 +55,9 @@ def update_activity(activity_id: int,activity: ActivityUpdate):
     })
     .eq("id", activity_id)
     .execute()
+    
 )
+
    
     return result.data
 
@@ -75,5 +77,15 @@ def add_activity(activity: ActivityUpdate):
 
     return response.data
     
+@app.delete("/activities/{activity_id}")
 
+def deleteActivity(activity_id: int):
 
+    response = (
+    supabase
+    .table("Activities")
+    .delete()
+    .eq("id", activity_id)
+    .execute()
+    )
+    return response.data

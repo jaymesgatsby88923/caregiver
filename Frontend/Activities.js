@@ -1,3 +1,6 @@
+ let manageActivityId = null;
+let manageActivityName = ""
+
  async function loadActivities() {
 
         const response = await fetch(
@@ -16,30 +19,81 @@
             container.innerHTML += `
                 <div>
                     ${activity.Name}
-                    <button onclick="updateActivity( ${activity.id}, '${activity.Name}' )"> Update </button>
+                    <button onclick="manageActivity( ${activity.id}, '${activity.Name}' )"> Manage </button>
                 </div>
             `;
         });
     }
 
     loadActivities();
+
+
     
-async function updateActivity(
+async function manageActivity(
         activityId,
         currentName
     ) {
 
-        const newName = prompt(
-            "Enter new activity name:",
-            currentName
+        manageActivityId= activityId;
+        manageActivityName = currentName;
+        manageHeader = document.getElementById("manageTitle");
+        manageHeader.innerHTML=`Manage: ${manageActivityName}`
+        ManagePanel=document.getElementById("manageActivityPanel");
+        ManagePanel.hidden= false
+    }
+
+async function deleteActivity(){
+
+if (confirm(`Do you want to delete: ${manageActivityName}`) == true){
+    console.log("True Path")
+      const response = await fetch(
+            `http://127.0.0.1:8000/activities/${manageActivityId}`,
+            {
+                method: "DELETE",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    Name: manageActivityName
+                })
+            }
         );
+
+    manageActivityId = null;
+    manageActivityName=""
+    ManagePanel=document.getElementById("manageActivityPanel");
+    ManagePanel.hidden= true;
+    loadActivities();
+
+    }
+else{
+   manageActivityId = null;
+    manageActivityName=""
+    ManagePanel=document.getElementById("manageActivityPanel");
+    ManagePanel.hidden= true;
+} 
+
+
+
+}
+    
+async function updateActivity(){
+  
+    const newName = prompt(
+    "Enter new activity name:",
+    manageActivityName
+        );
+
 
         if (!newName) {
             return;
         }
 
         const response = await fetch(
-            `http://127.0.0.1:8000/activities/${activityId}`,
+            `http://127.0.0.1:8000/activities/${manageActivityId}`,
             {
                 method: "PATCH",
 
@@ -60,13 +114,23 @@ async function updateActivity(
 
             loadActivities();
             console.log("success")
+            manageActivityId = null;
+            manageActivityName=""
+            ManagePanel=document.getElementById("manageActivityPanel");
+            ManagePanel.hidden= true;
         } else {
 
             alert("Update failed");
             console.log("failed");
 
         }
+
+     
     }
+
+
+
+       
 
 async function addActivity(activityName)
 {
