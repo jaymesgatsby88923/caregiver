@@ -19,9 +19,10 @@ let manageActivityName = ""
             container.innerHTML += `
                 <div>
                     ${activity.Name}
-                    <button onclick="manageActivity( ${activity.id}, '${activity.Name}' )"> Manage </button>
+                    <button onclick="manageActivity( '${activity.activity_id}', '${activity.Name}' )"> Manage </button>
                 </div>
             `;
+        
         });
     }
 

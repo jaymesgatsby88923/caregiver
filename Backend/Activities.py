@@ -44,7 +44,7 @@ def activities() :
 
 @app.patch("/activities/{activity_id}")
 
-def update_activity(activity_id: int,activity: ActivityUpdate):
+def update_activity(activity_id: str,activity: ActivityUpdate):
 
 
     result = (
@@ -53,7 +53,7 @@ def update_activity(activity_id: int,activity: ActivityUpdate):
     .update({
         "Name": activity.Name
     })
-    .eq("id", activity_id)
+    .eq("activity_id", activity_id)
     .execute()
     
 )
@@ -79,13 +79,13 @@ def add_activity(activity: ActivityUpdate):
     
 @app.delete("/activities/{activity_id}")
 
-def deleteActivity(activity_id: int):
+def deleteActivity(activity_id: str):
 
     response = (
     supabase
     .table("Activities")
     .delete()
-    .eq("id", activity_id)
+    .eq("activity_id", activity_id)
     .execute()
     )
     return response.data

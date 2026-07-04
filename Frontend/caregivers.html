@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Caregivers Page</title>
+</head>
+
+<body>
+<div id="page">
+```
+   
+
+        <h1>Caregivers</h1>
+        <button onclick="addCaregiverForm()">Add Caregiver</button>
+
+        <div id="caregivers"></div>
+
+        <div id="manageCaregiverPanel" hidden>
+            <h2 id = "manageTitle"> Manage Caregiver</h2>
+            <h3 id="manageCaregiverTitle"></h3>
+            <button id="editButton" onclick=updateCaregiverForm()>Edit</button>
+            <button id="deleteButton" onclick=deleteCaregiver()>Delete</button>
+            <button id="cancelButton">Cancel</button>
+        </div>    
+    
+            
+    
+</div>
+<script src="caregivers.js"></script>
+<div id= "caregiverForm" hidden>
+<form>
+  <label for="fname">First name:</label><br>
+  <input type="text" id="fName" name="fname"><br>
+  <label for="lName">Last name:</label><br>
+  <input type="text" id="lName" name="lName"><br>
+  <label for="rate">Rate:</label><br>
+  <input type="text" id="rate" name="rate"><br>
+  <label for="phone">phone:</label><br>
+  <input type="text" id="phone" name="phone"><br>
+  <label for="email">Email:</label><br>
+  <input type="text" id="email" name="email">
+</form>
+</div>
+<button id="updateButton" onclick="updateCaregiver()" hidden>Update</button>
+<button id="saveButton" onclick="addCaregiver()" hidden>Save</button>
+</body>
+</html>
