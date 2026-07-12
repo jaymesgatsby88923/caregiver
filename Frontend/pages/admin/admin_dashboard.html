@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>CareApp | Admin Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/common.css">
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/admin_dashboard.css">
+
+</head>
+
+<body>
+
+    <!-- ======================================
+         Application Container
+    ======================================= -->
+
+    <div class="app-container">
+
+        <!-- ======================================
+             Top Navigation
+        ======================================= -->
+
+        <header class="top-header">
+
+            <div class="header-left">
+
+                <div class="logo-box">
+
+                    ❤️
+
+                </div>
+
+                <div class="logo-text">
+
+                    <h1>CareApp</h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <p>
+
+                    Welcome,
+
+                    <span id="welcome-name">
+
+                        Loading...
+
+                    </span>
+
+                </p>
+
+                <div class="header-divider"></div>
+
+                <button
+                    id="logout-button"
+                    class="logout-button">
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- ======================================
+             Sidebar
+        ======================================= -->
+
+        <aside class="sidebar">
+
+            <nav class="sidebar-nav">
+
+                <a
+                    href="admin_homepage.html"
+                    class="nav-item active">
+
+                    <span class="nav-icon">
+
+                        📊
+
+                    </span>
+
+                    <span>
+
+                        Dashboard
+
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="activities.html"
+                    class="nav-item">
+
+                    <span class="nav-icon">
+
+                        ✔️
+
+                    </span>
+
+                    <span>
+
+                        Activities
+
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="clients.html"
+                    class="nav-item">
+
+                    <span class="nav-icon">
+
+                        👤
+
+                    </span>
+
+                    <span>
+
+                        Clients
+
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="caregivers.html"
+                    class="nav-item">
+
+                    <span class="nav-icon">
+
+                        ❤️
+
+                    </span>
+
+                    <span>
+
+                        Caregivers
+
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="assignments.html"
+                    class="nav-item">
+
+                    <span class="nav-icon">
+
+                        🔗
+
+                    </span>
+
+                    <span>
+
+                        Assignments
+
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="shifts.html"
+                    class="nav-item">
+
+                    <span class="nav-icon">
+
+                        📅
+
+                    </span>
+
+                    <span>
+
+                        Shifts
+
+                    </span>
+
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-footer">
+
+                <p>
+
+                    CareApp Admin v1.0
+
+                </p>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ======================================
+             Main Content
+        ======================================= -->
+
+        <main class="main-content">
+
+            <div class="content-wrapper">
+
+
+                <!-- ===========================
+                     Dashboard Heading
+                ============================ -->
+
+                <section class="page-header">
+
+                    <h2>
+
+                        Dashboard
+
+                    </h2>
+
+                    <p>
+
+                        Here's what's happening across your care network today.
+
+                    </p>
+
+                </section>
+
+
+
+                <!-- ===========================
+                     Today's Overview
+                ============================ -->
+
+                <section class="dashboard-section">
+
+                    <h3 class="section-title">
+
+                        Today's Overview
+
+                    </h3>
+
+                    <div class="stats-grid">
+
+
+                        <!-- Active Shifts -->
+
+                        <article class="card stat-card">
+
+                            <div class="stat-icon">
+
+                                🕒
+
+                            </div>
+
+                            <div class="stat-content">
+
+                                <p class="stat-number"
+                                   id="active-shifts">
+
+                                    0
+
+                                </p>
+
+                                <p class="stat-label">
+
+                                    Active Shifts
+
+                                </p>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Open Shifts -->
+
+                        <article class="card stat-card">
+
+                            <div class="stat-icon danger">
+
+                                📅
+
+                            </div>
+
+                            <div class="stat-content">
+
+                                <p class="stat-number"
+                                   id="open-shifts">
+
+                                    0
+
+                                </p>
+
+                                <p class="stat-label">
+
+                                    Open Shifts
+
+                                </p>
+
+                            </div>
+
+                        </article>
+                        <!-- Total Clients -->
+
+                        <article class="card stat-card">
+
+                            <div class="stat-icon">
+
+                                👤
+
+                            </div>
+
+                            <div class="stat-content">
+
+                                <p
+                                    class="stat-number"
+                                    id="total-clients">
+
+                                    0
+
+                                </p>
+
+                                <p class="stat-label">
+
+                                    Total Clients
+
+                                </p>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Total Caregivers -->
+
+                        <article class="card stat-card">
+
+                            <div class="stat-icon neutral">
+
+                                ❤️
+
+                            </div>
+
+                            <div class="stat-content">
+
+                                <p
+                                    class="stat-number"
+                                    id="total-caregivers">
+
+                                    0
+
+                                </p>
+
+                                <p class="stat-label">
+
+                                    Total Caregivers
+
+                                </p>
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- ===========================
+                     Quick Actions
+                ============================ -->
+
+                <section class="dashboard-section">
+
+                    <h3 class="section-title">
+
+                        Quick Actions
+
+                    </h3>
+
+                    <div class="actions-grid">
+
+
+
+                        <!-- Activities -->
+
+                        <article class="card action-card">
+
+                            <div class="action-content">
+
+                                <h4>
+
+                                    Activities
+
+                                </h4>
+
+                                <p>
+
+                                    Manage care activities.
+
+                                </p>
+
+                            </div>
+
+                            <a
+                                class="primary-button"
+                                href="activities.html">
+
+                                Manage
+
+                            </a>
+
+                        </article>
+
+
+
+                        <!-- Clients -->
+
+                        <article class="card action-card">
+
+                            <div class="action-content">
+
+                                <h4>
+
+                                    Clients
+
+                                </h4>
+
+                                <p>
+
+                                    Manage client records.
+
+                                </p>
+
+                            </div>
+
+                            <a
+                                class="primary-button"
+                                href="clients.html">
+
+                                Manage
+
+                            </a>
+
+                        </article>
+
+
+
+                        <!-- Caregivers -->
+
+                        <article class="card action-card">
+
+                            <div class="action-content">
+
+                                <h4>
+
+                                    Caregivers
+
+                                </h4>
+
+                                <p>
+
+                                    Manage caregiver accounts.
+
+                                </p>
+
+                            </div>
+
+                            <a
+                                class="primary-button"
+                                href="caregivers.html">
+
+                                Manage
+
+                            </a>
+
+                        </article>
+
+
+
+                        <!-- Assignments -->
+
+                        <article class="card action-card">
+                            <div class="action-content">
+
+                                <h4>
+
+                                    Assignments
+
+                                </h4>
+
+                                <p>
+
+                                    Assign caregivers to clients.
+
+                                </p>
+
+                            </div>
+
+                            <a
+                                class="primary-button"
+                                href="assignments.html">
+
+                                Manage
+
+                            </a>
+
+                        </article>
+
+
+
+                        <!-- Shifts -->
+
+                        <article class="card action-card">
+
+                            <div class="action-content">
+
+                                <h4>
+
+                                    Shifts
+
+                                </h4>
+
+                                <p>
+
+                                    Manage caregiver schedules.
+
+                                </p>
+
+                            </div>
+
+                            <a
+                                class="primary-button"
+                                href="shifts.html">
+
+                                Manage
+
+                            </a>
+
+                        </article>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+
+    <script src="../../assets/js/admin_dashboard.js"></script>
+
+</body>
+
+</html>

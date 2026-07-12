@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareApp | Register</title>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="../css/common.css">
+
+    <!-- Registration Page Styles -->
+    <link rel="stylesheet" href="../css/register.css">
+</head>
+
+<body>
+
+    <main class="register-container">
+
+        <!-- Registration Card -->
+        <section class="card register-card">
+
+            <!-- Page Header -->
+            <header class="register-header">
+
+                <h1 class="logo">CareApp</h1>
+
+                <h2>Create Your Account</h2>
+
+                <p>
+                    Register to access the Care Management System.
+                </p>
+
+            </header>
+
+            <!-- Success / Error Messages -->
+            <div id="message-container"></div>
+
+            <!-- Registration Form -->
+            <form id="register-form" novalidate>
+
+                <!-- First Name -->
+                <div class="form-group">
+
+                    <label for="first-name">First Name</label>
+
+                    <input
+                        type="text"
+                        id="first-name"
+                        name="first-name"
+                        placeholder="Enter your first name"
+                        autocomplete="given-name"
+                        required
+                    >
+
+                    <small class="error-message" id="first-name-error"></small>
+
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-group">
+
+                    <label for="last-name">Last Name</label>
+
+                    <input
+                        type="text"
+                        id="last-name"
+                        name="last-name"
+                        placeholder="Enter your last name"
+                        autocomplete="family-name"
+                        required
+                    >
+
+                    <small class="error-message" id="last-name-error"></small>
+
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+
+                    <label for="email">Email Address</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <small class="error-message" id="email-error"></small>
+
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+
+                    <label for="password">Password</label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <small class="error-message" id="password-error"></small>
+
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+
+                    <label for="confirm-password">Confirm Password</label>
+
+                    <input
+                        type="password"
+                        id="confirm-password"
+                        name="confirm-password"
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <small class="error-message" id="confirm-password-error"></small>
+
+                </div>
+
+                <!-- Terms -->
+                <div class="checkbox-group">
+
+                    <input
+                        type="checkbox"
+                        id="terms"
+                        name="terms"
+                    >
+
+                    <label for="terms">
+                        I agree to the
+                        <a href="#">Terms of Service</a>
+                        and
+                        <a href="#">Privacy Policy</a>.
+                    </label>
+
+                </div>
+
+                <small class="error-message" id="terms-error"></small>
+
+                <!-- Register Button -->
+                <button
+                    type="submit"
+                    id="register-button"
+                >
+                    Create Account
+                </button>
+
+            </form>
+
+            <!-- Footer -->
+            <footer class="register-footer">
+
+                <p>
+                    Already have an account?
+
+                    <a href="login.html">
+                        Login
+                    </a>
+
+                </p>
+
+            </footer>
+
+        </section>
+
+    </main>
+
+    <!-- Registration JavaScript -->
+    <script src="../js/register.js"></script>
+
+</body>
+</html>

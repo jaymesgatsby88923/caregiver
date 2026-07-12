@@ -1,0 +1,187 @@
+/* ==========================================================
+   Registration Page
+   ========================================================== */
+
+
+/* ===========================
+   Main Container
+=========================== */
+
+.register-container {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 40px 20px;
+
+}
+
+
+/* ===========================
+   Registration Card
+=========================== */
+
+.register-card {
+
+    width: 100%;
+
+    max-width: 500px;
+
+    padding: 40px;
+
+}
+
+
+/* ===========================
+   Header
+=========================== */
+
+.register-header {
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+}
+
+.logo {
+
+    color: var(--primary-red);
+
+    font-size: 2rem;
+
+    margin-bottom: 10px;
+
+    letter-spacing: 1px;
+
+}
+
+.register-header h2 {
+
+    font-size: 1.8rem;
+
+    margin-bottom: 10px;
+
+}
+
+.register-header p {
+
+    color: var(--text-secondary);
+
+}
+
+
+/* ===========================
+   Form
+=========================== */
+
+#register-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+/* ===========================
+   Checkbox
+=========================== */
+
+.checkbox-group {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+}
+
+.checkbox-group input {
+
+    width: auto;
+
+    margin-top: 5px;
+
+}
+
+.checkbox-group label {
+
+    margin-bottom: 0;
+
+    font-weight: normal;
+
+    line-height: 1.5;
+
+}
+
+
+/* ===========================
+   Register Button
+=========================== */
+
+#register-button {
+
+    background-color: var(--primary-blue);
+
+    color: white;
+
+    margin-top: 10px;
+
+}
+
+#register-button:hover {
+
+    background-color: var(--primary-blue-dark);
+
+}
+
+
+/* ===========================
+   Footer
+=========================== */
+
+.register-footer {
+
+    text-align: center;
+
+    margin-top: 30px;
+
+    color: var(--text-secondary);
+
+}
+
+.register-footer a {
+
+    color: var(--primary-red);
+
+}
+
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width: 600px) {
+
+    .register-card {
+
+        padding: 30px 20px;
+
+    }
+
+    .register-header h2 {
+
+        font-size: 1.5rem;
+
+    }
+
+}

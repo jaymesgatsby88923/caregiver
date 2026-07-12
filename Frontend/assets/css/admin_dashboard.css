@@ -1,0 +1,635 @@
+/* ==========================================================
+   CareApp Admin Dashboard
+   Part 1 - Application Layout
+   ==========================================================*/
+
+
+/* ===========================
+   Application Layout
+=========================== */
+
+.app-container{
+
+    min-height:100vh;
+
+    display:flex;
+
+    background:var(--background-color);
+
+}
+
+
+/* ===========================
+   Header
+=========================== */
+
+.top-header{
+
+    position:fixed;
+
+    top:0;
+
+    left:0;
+
+    right:0;
+
+    height:72px;
+
+    background:white;
+
+    border-bottom:1px solid var(--border-color);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 32px;
+
+    z-index:1000;
+
+}
+
+
+/* ===========================
+   Header Left
+=========================== */
+
+.header-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+}
+
+
+.logo-box{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:14px;
+
+    background:var(--primary-blue);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:22px;
+
+}
+
+
+.logo-text h1{
+
+    font-size:24px;
+
+    font-weight:700;
+
+}
+
+
+/* ===========================
+   Header Right
+=========================== */
+
+.header-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+}
+
+
+.welcome-message{
+
+    color:var(--text-secondary);
+
+    font-weight:500;
+
+}
+
+
+#welcome-name{
+
+    color:var(--text-primary);
+
+    font-weight:700;
+
+}
+
+
+.header-divider{
+
+    width:1px;
+
+    height:30px;
+
+    background:var(--border-color);
+
+}
+
+
+.logout-button{
+
+    background:var(--primary-red);
+
+    color:white;
+
+    padding:10px 18px;
+
+}
+
+.logout-button:hover{
+
+    background:var(--primary-red-dark);
+
+}
+
+
+/* ===========================
+   Sidebar
+=========================== */
+
+.sidebar{
+
+    position:fixed;
+
+    top:72px;
+
+    left:0;
+
+    bottom:0;
+
+    width:250px;
+
+    background:white;
+
+    border-right:1px solid var(--border-color);
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    padding:24px 16px;
+
+}
+
+
+/* ===========================
+   Sidebar Navigation
+=========================== */
+
+.sidebar-nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+
+.nav-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    padding:14px 16px;
+
+    border-radius:12px;
+
+    color:var(--text-primary);
+
+    transition:.2s;
+
+}
+
+
+.nav-item:hover{
+
+    background:#EEF4FF;
+
+    text-decoration:none;
+
+}
+
+
+.nav-item.active{
+
+    background:#E8F0FE;
+
+    color:var(--primary-blue);
+
+    font-weight:700;
+
+}
+
+
+.nav-icon{
+
+    font-size:18px;
+
+}
+
+
+.sidebar-footer{
+
+    text-align:center;
+
+    color:var(--text-secondary);
+
+    font-size:14px;
+
+}
+
+
+/* ===========================
+   Main Content
+=========================== */
+
+.main-content{
+
+    flex:1;
+
+    margin-left:250px;
+
+    margin-top:72px;
+
+    padding:40px;
+
+}
+
+
+.content-wrapper{
+
+    max-width:1200px;
+
+    margin:0 auto;
+
+}
+
+
+/* ===========================
+   Dashboard Heading
+=========================== */
+
+.page-header{
+
+    margin-bottom:40px;
+
+}
+
+
+.page-header h2{
+
+    font-size:36px;
+
+    margin-bottom:10px;
+
+}
+
+
+.page-header p{
+
+    color:var(--text-secondary);
+
+    font-size:17px;
+
+}
+
+
+/* ===========================
+   Dashboard Sections
+=========================== */
+
+.dashboard-section{
+
+    margin-bottom:50px;
+
+}
+
+
+.section-title{
+
+    margin-bottom:22px;
+
+    color:var(--text-secondary);
+
+    font-size:14px;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+}
+
+
+/* part 2*/
+/* ==========================================================
+   CareApp Admin Dashboard
+   Part 2 - Dashboard Components
+   ==========================================================*/
+
+
+/* ===========================
+   Statistics Grid
+=========================== */
+
+.stats-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+
+    gap:24px;
+
+}
+
+
+/* ===========================
+   Statistic Cards
+=========================== */
+
+.stat-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    padding:28px;
+
+    transition:.25s;
+
+}
+
+
+.stat-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 14px 32px rgba(0,0,0,.12);
+
+}
+
+
+.stat-icon{
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:16px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:26px;
+
+    background:#E8F0FE;
+
+}
+
+
+.stat-icon.danger{
+
+    background:#FDECEC;
+
+}
+
+
+.stat-icon.neutral{
+
+    background:#EEF2FF;
+
+}
+
+
+.stat-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+.stat-number{
+
+    font-size:34px;
+
+    font-weight:700;
+
+    line-height:1;
+
+    margin-bottom:8px;
+
+}
+
+
+.stat-label{
+
+    color:var(--text-secondary);
+
+    font-size:15px;
+
+}
+
+
+/* ===========================
+   Quick Actions
+=========================== */
+
+.actions-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+    gap:24px;
+
+}
+
+
+/* ===========================
+   Action Cards
+=========================== */
+
+.action-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:28px;
+
+    min-height:220px;
+
+    transition:.25s;
+
+}
+
+
+.action-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 14px 32px rgba(0,0,0,.12);
+
+}
+
+
+.action-content{
+
+    flex:1;
+
+}
+
+
+.action-content h4{
+
+    font-size:22px;
+
+    margin-bottom:14px;
+
+}
+
+
+.action-content p{
+
+    color:var(--text-secondary);
+
+    line-height:1.6;
+
+}
+
+
+/* ===========================
+   Primary Button
+=========================== */
+
+.primary-button{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    width:100%;
+
+    background:var(--primary-blue);
+
+    color:white;
+
+    padding:14px;
+
+    border-radius:10px;
+
+    font-weight:700;
+
+    transition:.25s;
+
+}
+
+
+.primary-button:hover{
+
+    background:var(--primary-blue-dark);
+
+    text-decoration:none;
+
+}
+
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width:1000px){
+
+    .main-content{
+
+        padding:30px;
+
+    }
+
+}
+
+
+@media (max-width:850px){
+
+    .sidebar{
+
+        width:210px;
+
+    }
+
+    .main-content{
+
+        margin-left:210px;
+
+    }
+
+}
+
+
+@media (max-width:700px){
+
+    .top-header{
+
+        padding:0 20px;
+
+    }
+
+    .sidebar{
+
+        display:none;
+
+    }
+
+    .main-content{
+
+        margin-left:0;
+
+        padding:24px;
+
+    }
+
+    .stats-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .actions-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
