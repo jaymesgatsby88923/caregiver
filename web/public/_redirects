@@ -1,0 +1,2 @@
+# Cloudflare Pages: send every path to index.html so React Router can handle /login, /admin, etc.
+/*    /index.html   200

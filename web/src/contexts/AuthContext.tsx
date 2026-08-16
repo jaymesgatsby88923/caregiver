@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { authToken } from "@/services/api";
 import { authService } from "@/services/authService";
 import type { CurrentUser } from "@/types";
 
@@ -24,7 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadUser = useCallback(async () => {
-    const token = localStorage.getItem("access_token");
+    const token = authToken.get();
     if (!token) {
       setUser(null);
       setIsLoading(false);
@@ -35,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentUser = await authService.getCurrentUser();
       setUser(currentUser);
     } catch {
-      localStorage.removeItem("access_token");
+      authToken.clear();
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -48,14 +49,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const { access_token } = await authService.login(email, password);
-    localStorage.setItem("access_token", access_token);
+    authToken.set(access_token);
     const currentUser = await authService.getCurrentUser();
     setUser(currentUser);
     return currentUser;
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("access_token");
+    authToken.clear();
     setUser(null);
   }, []);
 
