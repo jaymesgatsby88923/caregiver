@@ -1,7 +1,10 @@
 from pydantic import BaseModel
+from typing import Optional
+  
 
 class ActivityCreate(BaseModel):
     name: str
-
+    
 class ActivityUpdate(BaseModel):
-    name: str
+    name: Optional[str] = None 
+    active: Optional[bool]=None

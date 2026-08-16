@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", initializeDashboard);
 // ===========================
 
 async function initializeDashboard(){
+    await initializeLayout("admin");
 
     await loadCurrentUser();
 

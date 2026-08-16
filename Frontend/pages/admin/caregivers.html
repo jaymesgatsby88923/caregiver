@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Caregivers</title>
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/common.css">
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/layout.css">
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/caregivers.css">
+
+</head>
+
+<body>
+
+<div id="header-container"></div>
+
+    <div class="app-container">
+         <div id="sidebar-container"></div>
+<!--
+        <aside class="sidebar">
+
+             Sidebar Navigation 
+
+        </aside>-->
+
+        <main class="main-content">
+
+            <!-- ===================================== -->
+            <!-- Page Header -->
+            <!-- ===================================== -->
+
+            <section class="page-header">
+
+                <div>
+
+                    <h2>Caregivers</h2>
+
+                    <p>
+                        Manage caregivers within your agency.
+                    </p>
+
+                </div>
+
+                <button
+                    id="add-caregiver-button"
+                    class="primary-button">
+
+                    + Add Caregiver
+
+                </button>
+
+            </section>
+
+            <!-- ===================================== -->
+            <!-- Search -->
+            <!-- ===================================== -->
+
+            <section class="search-section">
+
+                <input
+                    id="search-input"
+                    type="text"
+                    placeholder="Search caregivers...">
+
+            </section>
+
+            <!-- ===================================== -->
+            <!-- Summary Cards -->
+            <!-- ===================================== -->
+
+            <section class="summary-grid">
+
+                <div class="summary-card">
+
+                    <h3>Total</h3>
+
+                    <p id="total-caregivers">
+                        0
+                    </p>
+
+                </div>
+
+                <div class="summary-card">
+
+                    <h3>Active</h3>
+
+                    <p id="active-caregivers">
+                        0
+                    </p>
+
+                </div>
+
+                <div class="summary-card">
+
+                    <h3>Inactive</h3>
+
+                    <p id="inactive-caregivers">
+                        0
+                    </p>
+
+                </div>
+
+            </section>
+
+            <!-- ===================================== -->
+            <!-- Caregiver List -->
+            <!-- ===================================== -->
+
+            <section
+                id="caregiver-list"
+                class="card-grid">
+
+            </section>
+
+            <!-- ===================================== -->
+            <!-- Empty State -->
+            <!-- ===================================== -->
+
+            <section
+                id="empty-state"
+                class="empty-state hidden">
+
+                <h3>
+
+                    No caregivers found
+
+                </h3>
+
+                <p>
+
+                    Add your first caregiver to begin.
+
+                </p>
+
+                <button
+                    id="empty-add-button"
+                    class="primary-button">
+
+                    Add Caregiver
+
+                </button>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- ===================================== -->
+    <!-- Modal -->
+    <!-- ===================================== -->
+
+    <div
+        id="caregiver-modal"
+        class="modal hidden">
+
+        <div class="modal-overlay"></div>
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2 id="modal-title">
+
+                    Add Caregiver
+
+                </h2>
+
+                <button
+                    id="close-modal-button"
+                    class="icon-button">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+            <form id="caregiver-form">
+
+                <input
+                    id="caregiver-id"
+                    type="hidden">
+
+                <div class="form-group">
+
+                    <label
+                        for="caregiver-first-name">
+
+                        First Name
+
+                    </label>
+
+                    <input
+                        id="caregiver-first-name"
+                        type="text">
+
+                    <span
+                        id="caregiver-first-name-error"
+                        class="error-message">
+
+                    </span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label
+                        for="caregiver-last-name">
+
+                        Last Name
+
+                    </label>
+
+                    <input
+                        id="caregiver-last-name"
+                        type="text">
+
+                    <span
+                        id="caregiver-last-name-error"
+                        class="error-message">
+
+                    </span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label
+                        for="caregiver-rate">
+
+                        Hourly Rate
+
+                    </label>
+
+                    <input
+                        id="caregiver-rate"
+                        type="number"
+                        min="0">
+
+                    <span
+                        id="caregiver-rate-error"
+                        class="error-message">
+
+                    </span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label
+                        for="caregiver-phone">
+
+                        Phone Number
+
+                    </label>
+
+                    <input
+                        id="caregiver-phone"
+                        type="tel">
+
+                    <span
+                        id="caregiver-phone-error"
+                        class="error-message">
+
+                    </span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label
+                        for="caregiver-email">
+
+                        Email
+
+                    </label>
+
+                    <input
+                        id="caregiver-email"
+                        type="email">
+
+                    <span
+                        id="caregiver-email-error"
+                        class="error-message">
+
+                    </span>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        id="cancel-button"
+                        type="button"
+                        class="secondary-button">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        id="save-button"
+                        type="submit"
+                        class="primary-button">
+
+                        Save Caregiver
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+  <script src="../../assets/js/common.js"></script>
+
+<script src="../../assets/js/admin_caregivers.js"></script>
+
+</body>
+
+</html>

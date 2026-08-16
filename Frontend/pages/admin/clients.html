@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>CareApp | Clients</title>
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/common.css">
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/layout.css">
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/clients.css">
+
+</head>
+
+<body>
+
+    <div id="header-container"></div>
+
+    <div class="app-container">
+
+        <div id="sidebar-container"></div>
+
+
+        <!-- ======================================
+             Main Content
+        ======================================= -->
+
+        <main class="main-content">
+
+            <div class="content-wrapper">
+
+
+                <!-- ===========================
+                     Page Header
+                ============================ -->
+
+                <section class="page-header">
+
+                    <div>
+
+                        <h2 class="page-title">
+
+                            Clients
+
+                        </h2>
+
+                       
+                    </div>
+
+                    <button
+                        id="add-client-button"
+                        class="primary-button">
+
+                        + Add Client
+
+                    </button>
+
+                </section>
+
+
+                <!-- ===========================
+                     Summary
+                ============================ -->
+
+                <section class="page-section">
+
+                    <div class="summary-chips">
+
+                        <div class="summary-chip">
+
+                            <span id="total-clients">
+
+                                0
+
+                            </span>
+
+                            Total
+
+                        </div>
+
+                        <div class="summary-chip active-chip">
+
+                            <span id="active-clients">
+
+                                0
+
+                            </span>
+
+                            Active
+
+                        </div>
+
+                        <div class="summary-chip inactive-chip">
+
+                            <span id="inactive-clients">
+
+                                0
+
+                            </span>
+
+                            Inactive
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ===========================
+                     Search
+                ============================ -->
+
+                <section class="page-section">
+
+                    <div class="search-container">
+
+                        <input
+                            id="search-input"
+                            type="search"
+                            placeholder="Search clients...">
+
+                    </div>
+
+                </section>
+
+
+                <!-- ===========================
+                     Client List
+                ============================ -->
+
+                <section
+                    id="client-list"
+                    class="client-list">
+
+                    <!-- JavaScript inserts cards here -->
+
+                </section>
+
+
+                <!-- ===========================
+                     Empty State
+                ============================ -->
+
+                <section
+                    id="empty-state"
+                    class="empty-state hidden">
+
+                    <div class="empty-icon">
+
+                        👤
+
+                    </div>
+
+                    <h3>
+
+                        No Clients Found
+
+                    </h3>
+
+                    <p>
+
+                        Add your first client or adjust your search.
+
+                    </p>
+
+                    <button
+                        id="empty-add-button"
+                        class="primary-button">
+
+                        + Add Client
+
+                    </button>
+
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- ======================================
+         Client Modal
+    ======================================= -->
+
+    <div
+        id="client-modal"
+        class="modal hidden">
+
+        <div class="modal-overlay"></div>
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2 id="modal-title">
+
+                    Add Client
+
+                </h2>
+
+                <button
+                    id="close-modal-button"
+                    class="icon-button">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+
+            <form
+                id="client-form">
+
+                <input
+                    type="hidden"
+                    id="client-id">
+
+
+                <div class="form-group">
+
+                    <label for="client-first-name">
+
+                        First Name
+
+                    </label>
+
+                    <input
+                        id="client-first-name"
+                        type="text"
+                        maxlength="100">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="client-last-name">
+
+                        Last Name
+
+                    </label>
+
+                    <input
+                        id="client-last-name"
+                        type="text"
+                        maxlength="100">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="client-email">
+
+                        Email
+
+                    </label>
+
+                    <input
+                        id="client-email"
+                        type="email">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="client-phone">
+
+                        Phone
+
+                    </label>
+
+                    <input
+                        id="client-phone"
+                        type="tel">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="client-address">
+
+                        Address
+
+                    </label>
+
+                    <textarea
+                        id="client-address"
+                        rows="2">
+
+                    </textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="client-billing-rate">
+
+                        Billing Rate ($/hr)
+
+                    </label>
+
+                    <input
+                        id="client-billing-rate"
+                        type="number"
+                        min="0">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="client-notes">
+
+                        Notes
+
+                    </label>
+
+                    <textarea
+                        id="client-notes"
+                        rows="4">
+
+                    </textarea>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        id="cancel-button"
+                        class="secondary-button">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-button">
+
+                        Save Client
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+<!-- ======================================
+     Care Team Modal
+======================================= -->
+
+<div
+    id="care-team-modal"
+    class="modal hidden">
+
+    <div class="modal-overlay"></div>
+
+    <div class="modal-content">
+
+        <!-- ===========================
+             Header
+        ============================ -->
+
+        <div class="modal-header">
+
+            <h2 id="care-team-modal-title">
+
+                Manage Care Team
+
+            </h2>
+
+            <button
+                id="close-care-team-button"
+                class="icon-button">
+
+                ✕
+
+            </button>
+
+        </div>
+
+
+        <!-- ===========================
+             Hidden Client Id
+        ============================ -->
+
+        <input
+            type="hidden"
+            id="care-team-client-id">
+
+
+        <!-- ===========================
+             Search
+        ============================ -->
+
+        <div class="form-group">
+
+            <label for="caregiver-available">
+
+                Search Caregivers
+
+            </label>
+
+            <input
+                id="caregiver-available"
+                type="text"
+                placeholder="Search by first or last name...">
+
+        </div>
+
+
+        <!-- ===========================
+             Current Care Team
+        ============================ -->
+
+        <div class="care-team-section">
+
+            <h3>
+
+                Current Care Team
+
+            </h3>
+
+            <div
+                id="current-care-team"
+                class="care-team-list">
+
+                <!-- Current caregivers inserted here -->
+
+            </div>
+
+        </div>
+
+
+        <!-- ===========================
+             Search Results
+        ============================ -->
+
+        <div class="care-team-section">
+
+            <h3>
+
+                Available Caregivers
+
+            </h3>
+
+            <div
+                id="caregiver-available-results"
+                class="care-team-list">
+
+                <!-- Search results inserted here -->
+
+            </div>
+
+        </div>
+
+
+        <!-- ===========================
+             Footer
+        ============================ -->
+
+        <div class="modal-footer">
+
+            <button
+                type="button"
+                id="close-care-team-footer-button"
+                class="secondary-button">
+
+                Close
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+    <script
+        src="../../assets/js/common.js">
+
+    </script>
+
+    <script type = "module"
+        src="../../assets/js/admin_clients.js">
+
+    </script>
+
+</body>
+
+</html>

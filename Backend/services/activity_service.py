@@ -11,26 +11,31 @@ def get_activities(current_user):
     ) 
     return result.data
 
-def update_activity(activity_id: str,activity: ActivityUpdate):
+def update_activity(activity_id,activity: ActivityUpdate,current_user):
+
+    update_data = activity.model_dump(exclude_unset=True)
+
     result = (
     supabase
     .table("Activities")
-    .update({
-        "Name": activity.Name
-    })
-    .eq("activity_id", activity_id)
+    .update(
+      update_data
+    )
+    .eq("activity_id", activity_id,
+        )
     .execute()
     
 )   
     return result.data
 
-def add_activity(activity: ActivityCreate):
+def add_activity(activity: ActivityCreate,current_user):
+    print(activity) 
 
     response = (
         supabase.table("Activities")
         .insert(
             {
-                "Name": activity.Name
+                "name": activity.name
             }
         )
         .execute()

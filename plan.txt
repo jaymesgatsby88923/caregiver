@@ -1,0 +1,463 @@
+# CareApp — Page Specifications
+
+Product: Home care agency management platform  
+Roles: Admin, Caregiver, Client  
+Build order: Admin → Caregiver → Client  
+Frontend: Greenfield React + TypeScript (new app; do not reuse old Frontend or careapp-react code)  
+Backend: FastAPI + Supabase (extend as needed)
+
+---
+
+## Core concepts (reference)
+
+**Assignment (Care Team)**  
+Long-term link between a caregiver and a client. Controls HIPAA-scoped access: caregivers only see clients they are assigned to.
+
+**Shift**  
+One scheduled visit. Has a start and end time (may span multiple days, e.g. 72-hour live-in). One continuous clock-in/clock-out per shift. May be unassigned (open) until a caregiver claims or admin assigns it.
+
+**Activity**  
+Catalog item defining care tasks caregivers can perform during a shift (logged on caregiver side, visible to client in read-only summary).
+
+**Shift Comment**  
+Client (or client-linked user) comments on a specific shift. v1 only; other comment types may be added later.
+
+**Agency Setting: Open Shift Policy**  
+- `assigned_only` — only caregivers on the client’s care team can view/claim open shifts for that client  
+- `any_caregiver` — any active agency caregiver can view/claim open shifts
+
+**Auth rule**  
+Admin creates all user accounts. No public self-registration in production flow.
+
+---
+
+## Shared / foundation (not a user-facing page)
+
+**Purpose:** Support all pages below.
+
+**Includes:**
+- API client layer (auth headers, error handling)
+- Auth context (current user, role, login, logout)
+- Protected routes by role
+- Admin layout (header, sidebar, main content area)
+- Shared components (modal, buttons, empty states, loading/error states)
+- TypeScript types for domain entities
+
+---
+
+# ADMIN (web-first)
+
+---
+
+## 1. Login
+
+**Route:** `/` or `/login`  
+**Role:** All (redirects by role after login)
+
+**Purpose:**  
+Authenticate users and route them to the correct portal.
+
+**Functionality:**
+- Email and password form
+- Submit to backend auth
+- Store access token on success
+- Fetch current user (name, role)
+- Redirect by role:
+  - Admin → Admin Dashboard
+  - Caregiver → Caregiver home
+  - Client → Client home
+- Show error on invalid credentials
+- Loading state while signing in
+
+**Out of scope (v1):**
+- Public registration
+- Forgot password (placeholder link OK)
+
+---
+
+## 2. Admin Dashboard
+
+**Route:** `/admin`  
+**Role:** Admin only
+
+**Purpose:**  
+Operational overview of the agency at a glance.
+
+**Functionality:**
+- Welcome message with admin name
+- Summary stats (live from API when available):
+  - Active shifts (in progress)
+  - Open shifts (unassigned)
+  - Total clients
+  - Total caregivers
+- Quick links to main admin sections (Clients, Caregivers, Activities, Shifts, Users, Settings)
+- Empty or placeholder stats acceptable until Shifts API exists
+
+**Out of scope (v1):**
+- Billing/revenue reports
+- Advanced analytics
+
+---
+
+## 3. Clients
+
+**Route:** `/admin/clients`  
+**Role:** Admin only
+
+**Purpose:**  
+Manage people receiving care and their care teams.
+
+**Functionality:**
+- List all clients with search/filter
+- Summary counts: total, active, inactive
+- Add client (modal or dedicated form)
+- Edit client
+- Deactivate/reactivate client (prefer soft delete over hard delete)
+- Client fields:
+  - First name, last name
+  - Email, phone
+  - Address
+  - Billing rate ($/hr) — stored for future use
+  - Notes
+  - Active status
+- Empty state when no clients
+- **Care Team management (Assignments — no separate Assignments page):**
+  - Open “Manage Care Team” from a client
+  - View current assigned caregivers
+  - Search available caregivers
+  - Add caregiver to care team (create assignment)
+  - Remove caregiver from care team (deactivate/end assignment)
+  - Assignments define which caregivers may access this client’s data (HIPAA)
+
+**Out of scope (v1):**
+- Standalone Assignments page
+- Client portal features here
+- Invoicing
+
+---
+
+## 4. Caregivers
+
+**Route:** `/admin/caregivers`  
+**Role:** Admin only
+
+**Purpose:**  
+Manage caregiver staff records.
+
+**Functionality:**
+- List all caregivers with search/filter
+- Summary counts: total, active, inactive
+- Add caregiver (modal or form)
+- Edit caregiver
+- Deactivate/reactivate caregiver
+- Caregiver fields:
+  - First name, last name
+  - Email, phone
+  - Hourly rate — stored for future use
+  - Active status
+- Link to user account (when created via Users page)
+- Empty state when no caregivers
+
+**Out of scope (v1):**
+- Payroll
+- Credential/document tracking
+
+---
+
+## 5. Activities
+
+**Route:** `/admin/activities`  
+**Role:** Admin only
+
+**Purpose:**  
+Define the catalog of care tasks caregivers can perform and log during shifts.
+
+**Functionality:**
+- List all activities with search/filter
+- Summary counts: total, active, inactive
+- Add activity (modal or form)
+- Edit activity
+- Activate/deactivate activity
+- Activity fields:
+  - Name
+  - Description (optional but recommended)
+  - Active status
+- Empty state when no activities
+
+**Note:**  
+Activities are referenced during shift work on the caregiver side; clients see logged activities in read-only form.
+
+---
+
+## 6. Shifts
+
+**Route:** `/admin/shifts`  
+**Role:** Admin only
+
+**Purpose:**  
+Schedule and manage one-time care visits.
+
+**Functionality:**
+- List and/or calendar view of shifts
+- Filter by status, client, caregiver, date range
+- Create shift:
+  - Client (required)
+  - Caregiver (optional — null means open shift)
+  - Scheduled start datetime
+  - Scheduled end datetime (may span days; one continuous shift)
+  - Status: open | assigned | in_progress | completed | cancelled
+- Edit shift (before/during scheduling; restrict edits on completed shifts as appropriate)
+- Assign caregiver to open shift
+- Cancel shift
+- View shift detail:
+  - Scheduled vs actual times (clock-in/out when available)
+  - Status history or current status
+- Open shifts visible according to agency setting (for admin view: all open shifts)
+
+**Business rules:**
+- One shift = one visit block (do not split multi-day live-in into separate shifts unless different caregiver per day — future enhancement)
+- Open shift pickup rules enforced by agency Settings (backend + caregiver UI)
+
+**Out of scope (v1 admin UI):**
+- Activity logging (caregiver side)
+- Client comments (client side)
+- Billing from shift duration
+
+---
+
+## 7. Users
+
+**Route:** `/admin/users`  
+**Role:** Admin only
+
+**Purpose:**  
+Admin provisions all accounts for admins, caregivers, and clients.
+
+**Functionality:**
+- List users with role filter (admin, caregiver, client)
+- Create user:
+  - First name, last name
+  - Email
+  - Password (or invite flow — pick one approach)
+  - Role: admin | caregiver | client
+- On create:
+  - Create auth account
+  - Create Users record with role
+  - If caregiver: create/link Caregiver profile
+  - If client: create/link Client profile
+- Deactivate user (prevent login)
+- Edit basic user info (name, email; role change optional and careful)
+
+**Out of scope (v1):**
+- Self-registration
+- Password reset email flow (can add later)
+
+---
+
+## 8. Settings
+
+**Route:** `/admin/settings`  
+**Role:** Admin only
+
+**Purpose:**  
+Agency-level configuration.
+
+**Functionality (v1):**
+- **Open shift policy** (required):
+  - `assigned_only` — only care team members can claim open shifts for that client
+  - `any_caregiver` — any active caregiver in the agency can claim open shifts
+- Save and persist setting
+- Display short explanation of each option and HIPAA implications
+
+**Future settings (document only, not v1):**
+- Agency name, timezone
+- Default shift duration
+- Notification preferences
+
+---
+
+# CAREGIVER (mobile-first)
+
+---
+
+## 9. Caregiver Home / My Shifts
+
+**Route:** `/caregiver`  
+**Role:** Caregiver only
+
+**Purpose:**  
+Primary view of upcoming and active work.
+
+**Functionality:**
+- Today’s shifts and upcoming shifts
+- Show only shifts assigned to this caregiver
+- Show client name, address, scheduled start/end, status
+- Tap shift → Shift Detail
+- Navigation to Open Shifts
+- Mobile-first layout (large tap targets, simple list/card UI)
+
+**Access rule:**  
+Caregiver only sees clients they are assigned to (via care team).
+
+---
+
+## 10. Open Shifts
+
+**Route:** `/caregiver/open-shifts`  
+**Role:** Caregiver only
+
+**Purpose:**  
+Allow caregivers to claim unassigned shifts.
+
+**Functionality:**
+- List open shifts eligible for this caregiver per agency policy:
+  - `assigned_only`: open shifts for clients on their care team only
+  - `any_caregiver`: all open shifts in agency
+- Show client (limited info until claimed if needed), scheduled time, duration
+- Claim shift (assigns caregiver, updates status to assigned)
+- Confirmation before claim
+- Empty state when no open shifts
+
+---
+
+## 11. Caregiver Shift Detail
+
+**Route:** `/caregiver/shifts/:shiftId`  
+**Role:** Caregiver only (must be assigned to shift or claiming open shift)
+
+**Purpose:**  
+Execute a scheduled visit.
+
+**Functionality:**
+- Shift info: client, address, scheduled start/end, status
+- **Clock in** — records actual start time; status → in_progress
+- **Clock out** — records actual end time; status → completed
+- One continuous clock-in/out per shift (including multi-day live-in)
+- **Activity logging:**
+  - Select from active activities catalog
+  - Log with timestamp
+  - Optional notes per activity
+- View activities already logged this shift
+- Cannot access client/shift outside assignment rules
+
+**Out of scope (v1):**
+- GPS/EVV verification
+- Offline mode
+- Photos/attachments
+
+---
+
+# CLIENT (mobile-first)
+
+---
+
+## 12. Client Home / My Schedule
+
+**Route:** `/client`  
+**Role:** Client only
+
+**Purpose:**  
+Read-only view of care schedule.
+
+**Functionality:**
+- Upcoming and past shifts for this client only
+- Group display by calendar day (for multi-day shifts: one shift, activities/comments grouped by day in detail view)
+- Show scheduled time, assigned caregiver name, status
+- Tap shift → Client Shift Detail
+- Mobile-first layout
+
+---
+
+## 13. Client Shift Detail
+
+**Route:** `/client/shifts/:shiftId`  
+**Role:** Client only (own shifts only)
+
+**Purpose:**  
+Transparency into a completed or in-progress visit.
+
+**Functionality:**
+- Read-only shift info: caregiver, scheduled and actual times, status
+- Read-only list of activities logged during shift (with timestamps)
+- **Comments on shift:**
+  - View comment thread for this shift
+  - Add new comment (client author)
+  - Timestamps on all comments
+- Daily grouping in UI for long shifts: show activities/comments under the date they occurred
+
+**Out of scope (v1):**
+- Comment on individual activities (shift-level only)
+- Admin/caregiver replies in comment thread (may add later with visibility flags)
+- Editing or deleting comments (optional later)
+
+---
+
+# ROUTING SUMMARY
+
+| Route | Page | Role |
+|-------|------|------|
+| `/login` | Login | All |
+| `/admin` | Dashboard | Admin |
+| `/admin/clients` | Clients (+ Care Team) | Admin |
+| `/admin/caregivers` | Caregivers | Admin |
+| `/admin/activities` | Activities | Admin |
+| `/admin/shifts` | Shifts | Admin |
+| `/admin/users` | Users | Admin |
+| `/admin/settings` | Settings | Admin |
+| `/caregiver` | My Shifts | Caregiver |
+| `/caregiver/open-shifts` | Open Shifts | Caregiver |
+| `/caregiver/shifts/:id` | Shift Detail | Caregiver |
+| `/client` | My Schedule | Client |
+| `/client/shifts/:id` | Shift Detail | Client |
+
+**Not a page:** Standalone Assignments (handled inside Clients → Care Team)
+
+---
+
+# BUILD ORDER (page by page)
+
+1. Scaffold + auth + admin layout  
+2. Login  
+3. Admin Dashboard  
+4. Activities  
+5. Caregivers  
+6. Clients (+ Care Team)  
+7. Shifts  
+8. Users  
+9. Settings  
+10. Caregiver: My Shifts → Open Shifts → Shift Detail  
+11. Client: My Schedule → Shift Detail  
+
+---
+
+# BACKEND ENDPOINTS LIKELY NEEDED (reference)
+
+**Existing (extend as needed):**  
+Auth, Clients, Caregivers, Activities, Assignments/Care Team
+
+**New or extended for full app:**  
+- Shifts CRUD + status transitions  
+- Clock in / clock out  
+- Shift activity logs  
+- Shift comments (client)  
+- Agency settings (open shift policy)  
+- Admin user provisioning  
+- Dashboard aggregate stats  
+- Role-based access enforcement on all endpoints  
+
+---
+
+# DECISIONS LOG (locked)
+
+- Assignments managed from Client page only; no Assignments page  
+- Shift = one visit; may span days; one clock-in/out  
+- Open shift claim policy = agency setting  
+- Admin creates all users  
+- Billing/payroll = later; store rates for now  
+- Admin = web-first; Caregiver + Client = mobile-first  
+- Client comments on shift only (v1)  
+- Greenfield frontend; do not reuse old Frontend or careapp-react code  
+
+---
+
+End of document.

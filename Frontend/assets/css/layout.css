@@ -1,9 +1,3 @@
-/* ==========================================================
-   CareApp Admin Dashboard
-   Part 1 - Application Layout
-   ==========================================================*/
-
-
 /* ===========================
    Application Layout
 =========================== */
@@ -17,7 +11,6 @@
     background:var(--background-color);
 
 }
-
 
 /* ===========================
    Header
@@ -288,9 +281,8 @@
 
 }
 
-
 /* ===========================
-   Dashboard Heading
+   Page Heading
 =========================== */
 
 .page-header{
@@ -319,10 +311,10 @@
 
 
 /* ===========================
-   Dashboard Sections
+   Page Sections
 =========================== */
 
-.dashboard-section{
+.page-section{
 
     margin-bottom:50px;
 
@@ -340,296 +332,5 @@
     letter-spacing:1px;
 
     text-transform:uppercase;
-
-}
-
-
-/* part 2*/
-/* ==========================================================
-   CareApp Admin Dashboard
-   Part 2 - Dashboard Components
-   ==========================================================*/
-
-
-/* ===========================
-   Statistics Grid
-=========================== */
-
-.stats-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-
-    gap:24px;
-
-}
-
-
-/* ===========================
-   Statistic Cards
-=========================== */
-
-.stat-card{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:18px;
-
-    padding:28px;
-
-    transition:.25s;
-
-}
-
-
-.stat-card:hover{
-
-    transform:translateY(-4px);
-
-    box-shadow:0 14px 32px rgba(0,0,0,.12);
-
-}
-
-
-.stat-icon{
-
-    width:60px;
-
-    height:60px;
-
-    border-radius:16px;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:26px;
-
-    background:#E8F0FE;
-
-}
-
-
-.stat-icon.danger{
-
-    background:#FDECEC;
-
-}
-
-
-.stat-icon.neutral{
-
-    background:#EEF2FF;
-
-}
-
-
-.stat-content{
-
-    display:flex;
-
-    flex-direction:column;
-
-}
-
-
-.stat-number{
-
-    font-size:34px;
-
-    font-weight:700;
-
-    line-height:1;
-
-    margin-bottom:8px;
-
-}
-
-
-.stat-label{
-
-    color:var(--text-secondary);
-
-    font-size:15px;
-
-}
-
-
-/* ===========================
-   Quick Actions
-=========================== */
-
-.actions-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-
-    gap:24px;
-
-}
-
-
-/* ===========================
-   Action Cards
-=========================== */
-
-.action-card{
-
-    display:flex;
-
-    flex-direction:column;
-
-    padding:28px;
-
-    min-height:220px;
-
-    transition:.25s;
-
-}
-
-
-.action-card:hover{
-
-    transform:translateY(-4px);
-
-    box-shadow:0 14px 32px rgba(0,0,0,.12);
-
-}
-
-
-.action-content{
-
-    flex:1;
-
-}
-
-
-.action-content h4{
-
-    font-size:22px;
-
-    margin-bottom:14px;
-
-}
-
-
-.action-content p{
-
-    color:var(--text-secondary);
-
-    line-height:1.6;
-
-}
-
-
-/* ===========================
-   Primary Button
-=========================== */
-
-.primary-button{
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    width:100%;
-
-    background:var(--primary-blue);
-
-    color:white;
-
-    padding:14px;
-
-    border-radius:10px;
-
-    font-weight:700;
-
-    transition:.25s;
-
-}
-
-
-.primary-button:hover{
-
-    background:var(--primary-blue-dark);
-
-    text-decoration:none;
-
-}
-
-
-/* ===========================
-   Responsive
-=========================== */
-
-@media (max-width:1000px){
-
-    .main-content{
-
-        padding:30px;
-
-    }
-
-}
-
-
-@media (max-width:850px){
-
-    .sidebar{
-
-        width:210px;
-
-    }
-
-    .main-content{
-
-        margin-left:210px;
-
-    }
-
-}
-
-
-@media (max-width:700px){
-
-    .top-header{
-
-        padding:0 20px;
-
-    }
-
-    .sidebar{
-
-        display:none;
-
-    }
-
-    .main-content{
-
-        margin-left:0;
-
-        padding:24px;
-
-    }
-
-    .stats-grid{
-
-        grid-template-columns:1fr;
-
-    }
-
-    .actions-grid{
-
-        grid-template-columns:1fr;
-
-    }
 
 }
