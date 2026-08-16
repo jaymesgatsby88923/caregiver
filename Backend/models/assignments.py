@@ -1,16 +1,10 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
 
+# Assignments table: assignment_id, client_id, caregiver_id, active_id
 class AssignmentCreate(BaseModel):
-    client_id: Optional[str] = None
-    caregiver_id: Optional[str] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
+    client_id: str
+    caregiver_id: str
 
 class AssignmentUpdate(BaseModel):
-    assignment_id: Optional[str] = None
-    client_id: Optional[str] = None
-    caregiver_id: Optional[str] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None  
-
+    active_id: Optional[bool] = None

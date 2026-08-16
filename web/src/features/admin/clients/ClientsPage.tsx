@@ -119,6 +119,7 @@ function CareTeamModal({ client, isOpen, onClose }: CareTeamModalProps) {
   const [allCaregivers, setAllCaregivers] = useState<Caregiver[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isOpen || !client) return;
@@ -126,13 +127,16 @@ function CareTeamModal({ client, isOpen, onClose }: CareTeamModalProps) {
 
     async function load() {
       setIsLoading(true);
+      setError("");
       try {
         const [team, caregivers] = await Promise.all([
           clientService.getCareTeam(clientId),
           caregiverService.list(),
         ]);
-        setCareTeam(team);
+        setCareTeam(Array.isArray(team) ? team : []);
         setAllCaregivers(caregivers.filter((c) => c.active));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Could not load care team.");
       } finally {
         setIsLoading(false);
       }
@@ -155,16 +159,26 @@ function CareTeamModal({ client, isOpen, onClose }: CareTeamModalProps) {
 
   async function addToTeam(caregiverId: string) {
     if (!client) return;
-    await assignmentService.add(client.client_id, caregiverId);
-    const team = await clientService.getCareTeam(client.client_id);
-    setCareTeam(team);
+    setError("");
+    try {
+      await assignmentService.add(client.client_id, caregiverId);
+      const team = await clientService.getCareTeam(client.client_id);
+      setCareTeam(Array.isArray(team) ? team : []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not add caregiver.");
+    }
   }
 
   async function removeFromTeam(assignmentId: string) {
-    await assignmentService.remove(assignmentId);
     if (!client) return;
-    const team = await clientService.getCareTeam(client.client_id);
-    setCareTeam(team);
+    setError("");
+    try {
+      await assignmentService.remove(assignmentId);
+      const team = await clientService.getCareTeam(client.client_id);
+      setCareTeam(Array.isArray(team) ? team : []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not remove caregiver.");
+    }
   }
 
   if (!client) return null;
@@ -176,6 +190,9 @@ function CareTeamModal({ client, isOpen, onClose }: CareTeamModalProps) {
       onClose={onClose}
       wide
     >
+      {error ? (
+        <p className="mb-4 text-sm text-[var(--red)]">{error}</p>
+      ) : null}
       {isLoading ? (
         <LoadingState />
       ) : (
