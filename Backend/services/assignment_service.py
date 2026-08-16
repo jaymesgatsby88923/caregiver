@@ -18,7 +18,7 @@ def get_careteam(client_id: str, current_user):
             )
         """)
         .eq("client_id", client_id)
-        .eq("active_id", True)
+        .eq("active", True)
         .execute()
     )
     return result.data
@@ -41,7 +41,7 @@ def add_assignment(assignment: AssignmentCreate, current_user):
     existing = (
         supabase
         .table("Assignments")
-        .select("assignment_id, active_id")
+        .select("assignment_id, active")
         .eq("client_id", assignment.client_id)
         .eq("caregiver_id", assignment.caregiver_id)
         .execute()
@@ -49,12 +49,12 @@ def add_assignment(assignment: AssignmentCreate, current_user):
 
     if existing.data:
         row = existing.data[0]
-        if row.get("active_id"):
+        if row.get("active"):
             return existing.data
         result = (
             supabase
             .table("Assignments")
-            .update({"active_id": True})
+            .update({"active": True})
             .eq("assignment_id", row["assignment_id"])
             .execute()
         )
@@ -67,7 +67,7 @@ def add_assignment(assignment: AssignmentCreate, current_user):
             {
                 "client_id": assignment.client_id,
                 "caregiver_id": assignment.caregiver_id,
-                "active_id": True,
+                "active": True,
             }
         )
         .execute()
@@ -80,7 +80,7 @@ def delete_assignment(assignment_id: str):
     result = (
         supabase
         .table("Assignments")
-        .update({"active_id": False})
+        .update({"active": False})
         .eq("assignment_id", assignment_id)
         .execute()
     )

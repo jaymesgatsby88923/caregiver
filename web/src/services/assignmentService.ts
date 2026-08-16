@@ -1,6 +1,6 @@
 import { api } from "./api";
 
-// Add/remove care-team rows. Remove is a soft delete (active_id = false) on the backend.
+// Add/remove care-team rows. Remove is a soft delete (active = false) on the backend.
 export const assignmentService = {
   add: (clientId: string, caregiverId: string) =>
     api.post("/assignments", {
