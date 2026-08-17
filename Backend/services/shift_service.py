@@ -62,11 +62,19 @@ def _validate_care_team(client_id: str, caregiver_id: str):
         )
 
 
+def _first_related(value):
+    # PostgREST returns a nested object for many-to-one and a list for one-to-many.
+    if isinstance(value, list):
+        return value[0] if value else None
+    if isinstance(value, dict):
+        return value
+    return None
+
+
 def _format_shift(row: dict) -> dict:
-    client = row.pop("Clients", None) or {}
-    user = row.pop("Users", None) or {}
-    caregivers = user.get("Caregivers") if user else None
-    caregiver_profile = caregivers[0] if caregivers else None
+    client = _first_related(row.pop("Clients", None)) or {}
+    user = _first_related(row.pop("Users", None)) or {}
+    caregiver_profile = _first_related(user.get("Caregivers"))
 
     return {
         **row,
