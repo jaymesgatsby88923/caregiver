@@ -1,34 +1,45 @@
 from database.supabase import supabase
-from models.auth import LoginRequest, SignUpRequest
 from fastapi.security import HTTPBearer
 from fastapi import Depends, HTTPException
 
 security = HTTPBearer()
 
-def get_current_user(credentials = Depends(security)):
 
+def get_current_user(credentials=Depends(security)):
     token = credentials.credentials
     try:
-     user = supabase.auth.get_user(token)
-    
+        user = supabase.auth.get_user(token)
     except Exception:
         raise HTTPException(
-        status_code=401,
-        detail="Invalid or expired token"
-    )
-   
+            status_code=401,
+            detail="Invalid or expired token",
+        )
+
     auth_user_id = user.user.id
 
     response = (
-        supabase
-        .table("Users")
+        supabase.table("Users")
         .select("*")
         .eq("auth_user_id", auth_user_id)
         .execute()
     )
 
-   
+    if not response.data:
+        raise HTTPException(status_code=401, detail="User not found")
+
     return response.data[0]
+
+
+def require_admin(current_user=Depends(get_current_user)):
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return current_user
+
+
+def require_caregiver(current_user=Depends(get_current_user)):
+    if current_user.get("role") != "caregiver":
+        raise HTTPException(status_code=403, detail="Caregiver access required")
+    return current_user
 
 
 

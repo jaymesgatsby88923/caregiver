@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { clientService } from "@/services/clientService";
 import { caregiverService } from "@/services/caregiverService";
+import { shiftService } from "@/services/shiftService";
 import { SummaryChips } from "@/components/ui/PageHeader";
 
 const quickLinks = [
@@ -26,15 +27,17 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const [clients, caregivers] = await Promise.all([
+        const [clients, caregivers, inProgress, open] = await Promise.all([
           clientService.list(),
           caregiverService.list(),
+          shiftService.list({ status: "in_progress" }),
+          shiftService.list({ status: "open" }),
         ]);
         setStats({
           clients: clients.length,
           caregivers: caregivers.length,
-          activeShifts: 0,
-          openShifts: 0,
+          activeShifts: inProgress.length,
+          openShifts: open.length,
         });
       } catch {
         // Dashboard can render with zeros if API unavailable

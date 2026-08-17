@@ -8,6 +8,7 @@ import DashboardPage from "@/features/admin/dashboard/DashboardPage";
 import ActivitiesPage from "@/features/admin/activities/ActivitiesPage";
 import CaregiversPage from "@/features/admin/caregivers/CaregiversPage";
 import ClientsPage from "@/features/admin/clients/ClientsPage";
+import ShiftsPage from "@/features/admin/shifts/ShiftsPage";
 import PlaceholderPage from "@/features/admin/PlaceholderPage";
 import PortalShell from "@/components/layout/PortalShell";
 
@@ -25,15 +26,7 @@ export default function AppRoutes() {
               <Route path="activities" element={<ActivitiesPage />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="caregivers" element={<CaregiversPage />} />
-              <Route
-                path="shifts"
-                element={
-                  <PlaceholderPage
-                    title="Shifts"
-                    subtitle="Schedule one-time visits, assign caregivers, and manage open shifts."
-                  />
-                }
-              />
+              <Route path="shifts" element={<ShiftsPage />} />
               <Route
                 path="users"
                 element={

@@ -4,6 +4,7 @@ from routes.caregivers import router as caregivers_router
 from routes.clients import router as client_router
 from routes.auth import router as auth_router
 from routes.assignments import router as assignments_router
+from routes.shifts import router as shifts_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -29,3 +30,4 @@ app.include_router(activities_router)
 app.include_router(caregivers_router)
 app.include_router(auth_router)
 app.include_router(assignments_router)
+app.include_router(shifts_router)
