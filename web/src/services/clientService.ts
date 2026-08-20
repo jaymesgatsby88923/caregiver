@@ -12,15 +12,15 @@ export type ClientInput = {
 };
 
 export const clientService = {
-  list: () => api.get<Client[]>("/clients"),
+  list: () => api.get<Client[]>("/admin/clients"),
 
-  create: (data: ClientInput) => api.post<Client[]>("/clients", data),
+  create: (data: ClientInput) => api.post<Client[]>("/admin/clients", data),
 
   update: (id: string, data: Partial<ClientInput & { active: boolean }>) =>
-    api.patch<Client[]>(`/clients/${id}`, data),
+    api.patch<Client[]>(`/admin/clients/${id}`, data),
 
-  remove: (id: string) => api.delete<Client[]>(`/clients/${id}`),
+  remove: (id: string) => api.delete<Client[]>(`/admin/clients/${id}`),
 
   getCareTeam: (clientId: string) =>
-    api.get<CareTeamAssignment[]>(`/careteam/${clientId}`),
+    api.get<CareTeamAssignment[]>(`/admin/careteam/${clientId}`),
 };

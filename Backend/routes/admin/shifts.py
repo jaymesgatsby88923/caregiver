@@ -1,11 +1,12 @@
 from typing import Optional
 
-from auth.dependencies import get_current_user, require_admin, require_caregiver
+from auth.dependencies import require_admin
 from fastapi import APIRouter, Depends
 from models.shift import ShiftAssign, ShiftCreate, ShiftUpdate
-from services import shift_service
+from models.shift_comment import ShiftCommentCreate
+from services import shift_activity_service, shift_comment_service, shift_service
 
-router = APIRouter()
+router = APIRouter(prefix="/admin", dependencies=[Depends(require_admin)])
 
 
 @router.get("/shifts")
@@ -15,7 +16,7 @@ def list_shifts(
     caregiver_id: Optional[str] = None,
     start_from: Optional[str] = None,
     start_to: Optional[str] = None,
-    current_user=Depends(get_current_user),
+    current_user=Depends(require_admin),
 ):
     return shift_service.list_shifts(
         current_user,
@@ -28,15 +29,12 @@ def list_shifts(
 
 
 @router.get("/shifts/{shift_id}")
-def get_shift(shift_id: str, current_user=Depends(get_current_user)):
+def get_shift(shift_id: str, current_user=Depends(require_admin)):
     return shift_service.get_shift(shift_id, current_user)
 
 
 @router.post("/shifts")
-def create_shift(
-    shift: ShiftCreate,
-    current_user=Depends(require_admin),
-):
+def create_shift(shift: ShiftCreate, current_user=Depends(require_admin)):
     return shift_service.create_shift(shift, current_user)
 
 
@@ -77,11 +75,20 @@ def cancel_shift(shift_id: str, current_user=Depends(require_admin)):
     return shift_service.cancel_shift(shift_id, current_user)
 
 
-@router.post("/shifts/{shift_id}/clock-in")
-def clock_in(shift_id: str, current_user=Depends(require_caregiver)):
-    return shift_service.clock_in(shift_id, current_user)
+@router.get("/shifts/{shift_id}/activities")
+def list_shift_activities(shift_id: str, current_user=Depends(require_admin)):
+    return shift_activity_service.list_for_admin(shift_id, current_user)
 
 
-@router.post("/shifts/{shift_id}/clock-out")
-def clock_out(shift_id: str, current_user=Depends(require_caregiver)):
-    return shift_service.clock_out(shift_id, current_user)
+@router.get("/shifts/{shift_id}/comments")
+def list_shift_comments(shift_id: str, current_user=Depends(require_admin)):
+    return shift_comment_service.list_for_admin(shift_id, current_user)
+
+
+@router.post("/shifts/{shift_id}/comments")
+def add_shift_comment(
+    shift_id: str,
+    body: ShiftCommentCreate,
+    current_user=Depends(require_admin),
+):
+    return shift_comment_service.create_for_admin(shift_id, body, current_user)

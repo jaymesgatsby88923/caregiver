@@ -42,6 +42,12 @@ def require_caregiver(current_user=Depends(get_current_user)):
     return current_user
 
 
+def require_client(current_user=Depends(get_current_user)):
+    if current_user.get("role") != "client":
+        raise HTTPException(status_code=403, detail="Client access required")
+    return current_user
+
+
 
 
 

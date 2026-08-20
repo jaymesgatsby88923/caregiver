@@ -1,10 +1,12 @@
 from fastapi import FastAPI
-from routes.activities import router as activities_router
-from routes.caregivers import router as caregivers_router
-from routes.clients import router as client_router
+from routes.admin.activities import router as admin_activities_router
+from routes.admin.assignments import router as admin_assignments_router
+from routes.admin.caregivers import router as admin_caregivers_router
+from routes.admin.clients import router as admin_clients_router
+from routes.admin.shifts import router as admin_shifts_router
 from routes.auth import router as auth_router
-from routes.assignments import router as assignments_router
-from routes.shifts import router as shifts_router
+from routes.caregiver.shifts import router as caregiver_shifts_router
+from routes.client.shifts import router as client_shifts_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -25,9 +27,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(client_router)
-app.include_router(activities_router)
-app.include_router(caregivers_router)
 app.include_router(auth_router)
-app.include_router(assignments_router)
-app.include_router(shifts_router)
+app.include_router(admin_clients_router)
+app.include_router(admin_activities_router)
+app.include_router(admin_caregivers_router)
+app.include_router(admin_assignments_router)
+app.include_router(admin_shifts_router)
+app.include_router(caregiver_shifts_router)
+app.include_router(client_shifts_router)

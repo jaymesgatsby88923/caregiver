@@ -10,14 +10,14 @@ export type CaregiverInput = {
 };
 
 export const caregiverService = {
-  list: () => api.get<Caregiver[]>("/caregivers"),
+  list: () => api.get<Caregiver[]>("/admin/caregivers"),
 
-  create: (data: CaregiverInput) => api.post<Caregiver[]>("/caregivers", data),
+  create: (data: CaregiverInput) => api.post<Caregiver[]>("/admin/caregivers", data),
 
   update: (
     id: string,
     data: Partial<CaregiverInput & { active: boolean; user_id: string }>,
-  ) => api.patch<Caregiver[]>(`/caregivers/${id}`, data),
+  ) => api.patch<Caregiver[]>(`/admin/caregivers/${id}`, data),
 
-  remove: (id: string) => api.delete<Caregiver[]>(`/caregivers/${id}`),
+  remove: (id: string) => api.delete<Caregiver[]>(`/admin/caregivers/${id}`),
 };

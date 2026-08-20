@@ -19,3 +19,12 @@ class ClientUpdate(BaseModel):
     address:Optional[str] =None
     notes: Optional[str]=None
     active: Optional[bool]=None
+
+
+class CaregiverClient(BaseModel):
+    client_id: str
+    first_name: str
+    last_name: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    notes: Optional[str] = None

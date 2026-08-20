@@ -23,22 +23,22 @@ function buildQuery(params?: ShiftListParams): string {
 
 export const shiftService = {
   list: (params?: ShiftListParams) =>
-    api.get<Shift[]>(`/shifts${buildQuery(params)}`),
+    api.get<Shift[]>(`/admin/shifts${buildQuery(params)}`),
 
-  get: (id: string) => api.get<Shift>(`/shifts/${id}`),
+  get: (id: string) => api.get<Shift>(`/admin/shifts/${id}`),
 
-  create: (data: ShiftInput) => api.post<Shift>("/shifts", data),
+  create: (data: ShiftInput) => api.post<Shift>("/admin/shifts", data),
 
   update: (id: string, data: ShiftUpdateInput) =>
-    api.patch<Shift>(`/shifts/${id}`, data),
+    api.patch<Shift>(`/admin/shifts/${id}`, data),
 
   assign: (id: string, caregiverId: string) =>
-    api.post<Shift>(`/shifts/${id}/assign`, { caregiver_id: caregiverId }),
+    api.post<Shift>(`/admin/shifts/${id}/assign`, { caregiver_id: caregiverId }),
 
-  unassign: (id: string) => api.post<Shift>(`/shifts/${id}/unassign`, {}),
+  unassign: (id: string) => api.post<Shift>(`/admin/shifts/${id}/unassign`, {}),
 
   reassign: (id: string, caregiverId: string) =>
-    api.post<Shift>(`/shifts/${id}/reassign`, { caregiver_id: caregiverId }),
+    api.post<Shift>(`/admin/shifts/${id}/reassign`, { caregiver_id: caregiverId }),
 
-  cancel: (id: string) => api.post<Shift>(`/shifts/${id}/cancel`, {}),
+  cancel: (id: string) => api.post<Shift>(`/admin/shifts/${id}/cancel`, {}),
 };

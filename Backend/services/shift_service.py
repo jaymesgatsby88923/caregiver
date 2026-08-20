@@ -331,3 +331,79 @@ def clock_out(shift_id: str, current_user):
     if not result.data:
         raise HTTPException(status_code=500, detail="Failed to clock out")
     return get_shift(shift_id, current_user)
+
+
+def _get_client_id_for_user(current_user):
+    email = current_user.get("email")
+    if not email:
+        raise HTTPException(status_code=404, detail="Client profile not found")
+
+    result = (
+        supabase.table("Clients")
+        .select("client_id")
+        .eq("email", email)
+        .execute()
+    )
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Client profile not found")
+    return result.data[0]["client_id"]
+
+
+def list_shifts_for_caregiver(
+    current_user,
+    status: str | None = None,
+    start_from: str | None = None,
+    start_to: str | None = None,
+):
+    query = (
+        supabase.table("Shifts")
+        .select(SHIFT_SELECT)
+        .eq("caregiver_id", current_user["user_id"])
+    )
+
+    if status:
+        query = query.eq("status", status)
+    if start_from:
+        query = query.gte("scheduled_start_at", start_from)
+    if start_to:
+        query = query.lte("scheduled_start_at", start_to)
+
+    result = query.order("scheduled_start_at", desc=True).execute()
+    return [_format_shift(dict(row)) for row in result.data]
+
+
+def get_shift_for_caregiver(shift_id: str, current_user):
+    row = _get_shift_or_404(shift_id)
+    if row.get("caregiver_id") != current_user["user_id"]:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not assigned to this shift",
+        )
+    return _format_shift(dict(row))
+
+
+def list_shifts_for_client(
+    current_user,
+    status: str | None = None,
+    start_from: str | None = None,
+    start_to: str | None = None,
+):
+    client_id = _get_client_id_for_user(current_user)
+    return list_shifts(
+        current_user,
+        status=status,
+        client_id=client_id,
+        start_from=start_from,
+        start_to=start_to,
+    )
+
+
+def get_shift_for_client(shift_id: str, current_user):
+    client_id = _get_client_id_for_user(current_user)
+    row = _get_shift_or_404(shift_id)
+    if row["client_id"] != client_id:
+        raise HTTPException(
+            status_code=403,
+            detail="You do not have access to this shift",
+        )
+    return _format_shift(dict(row))
