@@ -16,4 +16,28 @@ export const authService = {
     ),
 
   getCurrentUser: () => api.get<CurrentUser>("/auth/current-user"),
+
+  forgotPassword: (email: string) =>
+    api.post<{ ok: boolean }>("/auth/forgot-password", { email }, { auth: false }),
+
+  resetPassword: (body: {
+    password: string;
+    access_token?: string | null;
+    refresh_token?: string | null;
+    code?: string | null;
+  }) =>
+    api.post<{ ok: boolean }>(
+      "/auth/reset-password",
+      {
+        password: body.password,
+        ...(body.code ? { code: body.code } : {}),
+        ...(body.access_token && body.refresh_token
+          ? {
+              access_token: body.access_token,
+              refresh_token: body.refresh_token,
+            }
+          : {}),
+      },
+      { auth: false },
+    ),
 };

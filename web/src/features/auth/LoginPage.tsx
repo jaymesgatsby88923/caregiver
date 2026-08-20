@@ -108,6 +108,12 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          <p className="mt-4 text-center text-sm">
+            <Link to="/reset-password" className="font-medium text-[var(--navy)] hover:underline">
+              Forgot password?
+            </Link>
+          </p>
+
           <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
             <Link to="/" className="font-medium text-[var(--navy)] hover:underline">
               ← Back to homepage

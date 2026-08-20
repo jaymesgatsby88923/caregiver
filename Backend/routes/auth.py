@@ -2,7 +2,12 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi.security import HTTPBearer
 from auth import auth_service
-from models.auth import LoginRequest, SignUpRequest
+from models.auth import (
+    ForgotPasswordRequest,
+    LoginRequest,
+    ResetPasswordRequest,
+    SignUpRequest,
+)
 from auth.dependencies import get_current_user
 
 
@@ -27,3 +32,13 @@ def current_user(current_user = Depends(get_current_user)):
         "first_name": current_user["first_name"],
         "role": current_user["role"]
     }
+
+
+@router.post("/forgot-password")
+def forgot_password(body: ForgotPasswordRequest):
+    return auth_service.forgot_password(body)
+
+
+@router.post("/reset-password")
+def reset_password(body: ResetPasswordRequest):
+    return auth_service.reset_password(body)

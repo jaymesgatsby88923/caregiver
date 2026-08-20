@@ -4,6 +4,7 @@ import ProtectedRoute from "@/components/routing/ProtectedRoute";
 import AdminLayout from "@/components/layout/AdminLayout";
 import MarketingPage from "@/features/marketing/MarketingPage";
 import LoginPage from "@/features/auth/LoginPage";
+import ResetPasswordPage from "@/features/auth/ResetPasswordPage";
 import DashboardPage from "@/features/admin/dashboard/DashboardPage";
 import ActivitiesPage from "@/features/admin/activities/ActivitiesPage";
 import CaregiversPage from "@/features/admin/caregivers/CaregiversPage";
@@ -19,6 +20,7 @@ export default function AppRoutes() {
         <Routes>
           <Route path="/" element={<MarketingPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
