@@ -10,42 +10,39 @@ import { Redirect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/services/api";
+import { authService } from "@/services/authService";
 import { AppText } from "@/components/ui/AppText";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { TextField } from "@/components/ui/TextField";
 import { colors, space, type } from "@/theme/tokens";
-import type { UserRole } from "@/types";
 
-function homeFor(role: UserRole) {
-  if (role === "caregiver") return "/(caregiver)";
-  if (role === "client") return "/(client)";
-  return "/admin";
-}
-
-export default function LoginScreen() {
-  const { user, login } = useAuth();
+export default function ForgotPasswordScreen() {
+  const { user } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   if (user) {
-    return <Redirect href={homeFor(user.role)} />;
+    return <Redirect href="/" />;
   }
 
-  async function handleSignIn() {
+  async function handleSend() {
     setError("");
+    setNotice("");
     setSubmitting(true);
     try {
-      const current = await login(email.trim(), password);
-      router.replace(homeFor(current.role));
+      await authService.forgotPassword(email.trim());
+      setNotice(
+        "If that email is on file, we sent a reset link. Open it in your browser to choose a new password, then come back here to sign in.",
+      );
     } catch (err) {
       setError(
         err instanceof ApiError
           ? err.message
-          : "Unable to sign in. Please try again.",
+          : "Unable to send a reset email. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -63,10 +60,10 @@ export default function LoginScreen() {
             <Logo />
           </View>
           <View style={styles.header}>
-            <AppText variant="title">Welcome back</AppText>
+            <AppText variant="title">Forgot password</AppText>
             <AppText>
-              Sign in to your care dashboard to view today's assignments and
-              client updates.
+              We’ll email a reset link if this address has an account. The link
+              opens on the website.
             </AppText>
           </View>
           <View style={styles.form}>
@@ -79,34 +76,29 @@ export default function LoginScreen() {
               value={email}
               onChangeText={setEmail}
             />
-            <TextField
-              label="Password"
-              secureTextEntry
-              placeholder="••••••••"
-              value={password}
-              onChangeText={setPassword}
-            />
             {error ? (
               <View style={styles.errorBox}>
                 <AppText color={colors.error}>{error}</AppText>
               </View>
             ) : null}
+            {notice ? (
+              <View style={styles.noticeBox}>
+                <AppText color={colors.navy}>{notice}</AppText>
+              </View>
+            ) : null}
             <Button
-              label="Sign In"
-              onPress={handleSignIn}
+              label="Send reset link"
+              onPress={handleSend}
               loading={submitting}
-              disabled={!email || !password}
+              disabled={!email}
             />
-            <Pressable onPress={() => router.push("/forgot-password")} hitSlop={8}>
-              <AppText style={styles.forgot} center>
-                Forgot password?
+            <Pressable onPress={() => router.back()} hitSlop={8}>
+              <AppText style={styles.back} center>
+                ← Back to sign in
               </AppText>
             </Pressable>
           </View>
         </View>
-        <AppText variant="muted" center style={styles.footer}>
-          Protected by secure care network
-        </AppText>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -119,7 +111,6 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
-    justifyContent: "space-between",
   },
   content: {
     paddingHorizontal: 28,
@@ -141,13 +132,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
-  footer: {
-    paddingBottom: space.xl,
+  noticeBox: {
+    backgroundColor: colors.tealSoft,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  forgot: {
+  back: {
     fontFamily: type.semibold,
     fontSize: 14,
     color: colors.navy,
-    marginTop: 4,
+    marginTop: space.sm,
   },
 });

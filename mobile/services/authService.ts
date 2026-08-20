@@ -11,4 +11,7 @@ export const authService = {
     api.post<LoginResponse>("/auth/login", { email, password }, { auth: false }),
 
   getCurrentUser: () => api.get<CurrentUser>("/auth/current-user"),
+
+  forgotPassword: (email: string) =>
+    api.post<{ ok: boolean }>("/auth/forgot-password", { email }, { auth: false }),
 };
