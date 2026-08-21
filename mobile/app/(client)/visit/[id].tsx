@@ -16,7 +16,13 @@ import {
   formatTimeRange,
   fullName,
 } from "@/lib/format";
-import type { Shift, ShiftActivity, ShiftComment } from "@/types";
+import type { Shift, ShiftActivity, ShiftComment, ShiftStatus } from "@/types";
+
+function visitTitle(status: ShiftStatus) {
+  if (status === "in_progress") return "Today's visit";
+  if (status === "completed") return "Past visit";
+  return "Upcoming visit";
+}
 
 export default function ClientVisitDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -89,8 +95,8 @@ export default function ClientVisitDetail() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <Screen loading={loading} contentContainerStyle={{ paddingBottom: 16 }}>
-        <BackHeader status={shift.status} />
-        <AppText variant="heading">Today's visit</AppText>
+        <BackHeader label="Back" status={shift.status} />
+        <AppText variant="heading">{visitTitle(shift.status)}</AppText>
         <MetaGrid
           items={[
             {

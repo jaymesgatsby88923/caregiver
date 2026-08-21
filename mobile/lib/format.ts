@@ -87,3 +87,24 @@ export function splitHomeShifts(shifts: Shift[]) {
   const [next, ...rest] = upcoming;
   return { hero: next ?? null, rest };
 }
+
+const UPCOMING_STATUSES: ShiftStatus[] = ["open", "assigned", "in_progress"];
+
+export function splitUpcomingAndPast(shifts: Shift[]) {
+  const visible = shifts.filter((shift) => shift.status !== "cancelled");
+  const upcoming = visible
+    .filter((shift) => UPCOMING_STATUSES.includes(shift.status))
+    .sort(
+      (a, b) =>
+        new Date(a.scheduled_start_at).getTime() -
+        new Date(b.scheduled_start_at).getTime(),
+    );
+  const past = visible
+    .filter((shift) => shift.status === "completed")
+    .sort(
+      (a, b) =>
+        new Date(b.scheduled_start_at).getTime() -
+        new Date(a.scheduled_start_at).getTime(),
+    );
+  return { upcoming, past };
+}
