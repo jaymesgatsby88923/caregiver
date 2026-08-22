@@ -3,9 +3,12 @@ import os
 from database.supabase import SUPABASE_KEY, SUPABASE_URL, supabase
 from fastapi import HTTPException
 from supabase import create_client
+from auth.dependencies import TRANSIENT_HTTPX, service_unavailable
 from models.auth import (
     ForgotPasswordRequest,
     LoginRequest,
+    LogoutRequest,
+    RefreshRequest,
     ResetPasswordRequest,
     SignUpRequest,
 )
@@ -73,6 +76,47 @@ def forgot_password(body: ForgotPasswordRequest):
             body.email,
             {"redirect_to": _reset_redirect_url()},
         )
+    except Exception:
+        pass
+    return {"ok": True}
+
+
+def refresh(body: RefreshRequest):
+    client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    try:
+        result = client.auth.refresh_session(body.refresh_token)
+    except TRANSIENT_HTTPX:
+        raise service_unavailable()
+    except Exception:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired refresh token",
+        )
+
+    session = result.session
+    if not session or not session.access_token or not session.refresh_token:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired refresh token",
+        )
+
+    return {
+        "access_token": session.access_token,
+        "refresh_token": session.refresh_token,
+    }
+
+
+def logout(body: LogoutRequest):
+    client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    try:
+        if body.access_token:
+            try:
+                client.auth.set_session(body.access_token, body.refresh_token)
+            except Exception:
+                client.auth.refresh_session(body.refresh_token)
+        else:
+            client.auth.refresh_session(body.refresh_token)
+        client.auth.sign_out()
     except Exception:
         pass
     return {"ok": True}

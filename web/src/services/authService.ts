@@ -17,6 +17,13 @@ export const authService = {
 
   getCurrentUser: () => api.get<CurrentUser>("/auth/current-user"),
 
+  logout: (refreshToken: string, accessToken: string | null) =>
+    api.post<{ ok: boolean }>(
+      "/auth/logout",
+      { refresh_token: refreshToken, access_token: accessToken },
+      { auth: false },
+    ),
+
   forgotPassword: (email: string) =>
     api.post<{ ok: boolean }>("/auth/forgot-password", { email }, { auth: false }),
 

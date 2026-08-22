@@ -1,14 +1,26 @@
+import httpx
 from database.supabase import supabase
 from fastapi.security import HTTPBearer
 from fastapi import Depends, HTTPException
 
 security = HTTPBearer()
 
+TRANSIENT_HTTPX = (httpx.TimeoutException, httpx.TransportError)
+
+
+def service_unavailable():
+    return HTTPException(
+        status_code=503,
+        detail="Authentication service unavailable",
+    )
+
 
 def get_current_user(credentials=Depends(security)):
     token = credentials.credentials
     try:
         user = supabase.auth.get_user(token)
+    except TRANSIENT_HTTPX:
+        raise service_unavailable()
     except Exception:
         raise HTTPException(
             status_code=401,
@@ -17,12 +29,15 @@ def get_current_user(credentials=Depends(security)):
 
     auth_user_id = user.user.id
 
-    response = (
-        supabase.table("Users")
-        .select("*")
-        .eq("auth_user_id", auth_user_id)
-        .execute()
-    )
+    try:
+        response = (
+            supabase.table("Users")
+            .select("*")
+            .eq("auth_user_id", auth_user_id)
+            .execute()
+        )
+    except TRANSIENT_HTTPX:
+        raise service_unavailable()
 
     if not response.data:
         raise HTTPException(status_code=401, detail="User not found")

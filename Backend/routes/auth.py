@@ -5,6 +5,8 @@ from auth import auth_service
 from models.auth import (
     ForgotPasswordRequest,
     LoginRequest,
+    LogoutRequest,
+    RefreshRequest,
     ResetPasswordRequest,
     SignUpRequest,
 )
@@ -32,6 +34,16 @@ def current_user(current_user = Depends(get_current_user)):
         "first_name": current_user["first_name"],
         "role": current_user["role"]
     }
+
+
+@router.post("/refresh")
+def refresh(body: RefreshRequest):
+    return auth_service.refresh(body)
+
+
+@router.post("/logout")
+def logout(body: LogoutRequest):
+    return auth_service.logout(body)
 
 
 @router.post("/forgot-password")

@@ -20,6 +20,15 @@ class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
 
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class LogoutRequest(BaseModel):
+    refresh_token: str
+    access_token: Optional[str] = None
+
+
 class ResetPasswordRequest(BaseModel):
     password: str
     access_token: Optional[str] = None

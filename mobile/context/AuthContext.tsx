@@ -8,7 +8,12 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "expo-router";
-import { authToken } from "@/services/api";
+import {
+  ApiError,
+  authToken,
+  setOnSessionInvalid,
+  tryRefreshSession,
+} from "@/services/api";
 import { authService } from "@/services/authService";
 import type { CurrentUser } from "@/types";
 
@@ -27,7 +32,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadUser = useCallback(async () => {
-    const token = await authToken.get();
+    let token = await authToken.get();
+    if (!token) {
+      const refreshed = await tryRefreshSession();
+      token = refreshed ? await authToken.get() : null;
+    }
     if (!token) {
       setUser(null);
       setIsLoading(false);
@@ -37,8 +46,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const currentUser = await authService.getCurrentUser();
       setUser(currentUser);
-    } catch {
-      await authToken.clear();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        await authToken.clear();
+      }
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -49,15 +60,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadUser();
   }, [loadUser]);
 
+  useEffect(() => {
+    setOnSessionInvalid(() => {
+      setUser(null);
+      router.replace("/login");
+    });
+    return () => setOnSessionInvalid(null);
+  }, [router]);
+
   const login = useCallback(async (email: string, password: string) => {
-    const { access_token } = await authService.login(email, password);
-    await authToken.set(access_token);
+    const { access_token, refresh_token } = await authService.login(
+      email,
+      password,
+    );
+    await authToken.set(access_token, refresh_token);
     const currentUser = await authService.getCurrentUser();
     setUser(currentUser);
     return currentUser;
   }, []);
 
   const logout = useCallback(async () => {
+    const refreshToken = await authToken.getRefresh();
+    const accessToken = await authToken.get();
+    if (refreshToken) {
+      try {
+        await authService.logout(refreshToken, accessToken);
+      } catch {
+        // Local logout still happens if revoke fails.
+      }
+    }
     await authToken.clear();
     setUser(null);
     router.replace("/login");
