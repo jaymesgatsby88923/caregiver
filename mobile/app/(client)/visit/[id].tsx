@@ -35,14 +35,10 @@ export default function ClientVisitDetail() {
 
   const load = useCallback(async () => {
     if (!id) return;
-    const [shiftRow, activityRows, commentRows] = await Promise.all([
-      clientService.getShift(id),
-      clientService.listActivities(id),
-      clientService.listComments(id),
-    ]);
+    const shiftRow = await clientService.getShift(id);
     setShift(shiftRow);
-    setActivities(activityRows);
-    setComments(commentRows);
+    setActivities(shiftRow.activities ?? []);
+    setComments(shiftRow.comments ?? []);
   }, [id]);
 
   useFocusEffect(

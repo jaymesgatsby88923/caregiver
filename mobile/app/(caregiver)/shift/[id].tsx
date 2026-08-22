@@ -29,7 +29,6 @@ import {
 } from "@/lib/format";
 import type {
   CatalogActivity,
-  CaregiverClient,
   Shift,
   ShiftActivity,
   ShiftComment,
@@ -40,7 +39,6 @@ export default function CaregiverShiftDetail() {
   const [shift, setShift] = useState<Shift | null>(null);
   const [activities, setActivities] = useState<ShiftActivity[]>([]);
   const [comments, setComments] = useState<ShiftComment[]>([]);
-  const [clients, setClients] = useState<CaregiverClient[]>([]);
   const [catalog, setCatalog] = useState<CatalogActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -50,19 +48,10 @@ export default function CaregiverShiftDetail() {
 
   const load = useCallback(async () => {
     if (!id) return;
-    const [shiftRow, activityRows, commentRows, clientRows, catalogRows] =
-      await Promise.all([
-        caregiverService.getShift(id),
-        caregiverService.listActivities(id),
-        caregiverService.listComments(id),
-        caregiverService.listClients(),
-        caregiverService.listCatalog(),
-      ]);
+    const shiftRow = await caregiverService.getShift(id);
     setShift(shiftRow);
-    setActivities(activityRows);
-    setComments(commentRows);
-    setClients(clientRows);
-    setCatalog(catalogRows);
+    setActivities(shiftRow.activities ?? []);
+    setComments(shiftRow.comments ?? []);
   }, [id]);
 
   useFocusEffect(
@@ -117,7 +106,7 @@ export default function CaregiverShiftDetail() {
     return <Screen loading={loading} />;
   }
 
-  const address = clients.find((client) => client.client_id === shift.client_id)?.address;
+  const address = shift.address;
   const canClockIn = shift.status === "assigned";
   const canClockOut = shift.status === "in_progress";
   const canLog = shift.status === "in_progress";
@@ -200,7 +189,18 @@ export default function CaregiverShiftDetail() {
           <Button
             label="Log activity"
             variant="secondary"
-            onPress={() => setPickerOpen(true)}
+            onPress={async () => {
+              setPickerOpen(true);
+              if (catalog.length > 0) return;
+              try {
+                setCatalog(await caregiverService.listCatalog());
+              } catch (err) {
+                Alert.alert(
+                  "Unable to load activities",
+                  err instanceof ApiError ? err.message : "Try again.",
+                );
+              }
+            }}
           />
         ) : null}
         <AppText variant="section">Visit discussion</AppText>

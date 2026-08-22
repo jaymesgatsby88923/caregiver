@@ -7,7 +7,7 @@ from models.shift import ShiftAssign, ShiftCreate, ShiftUpdate
 
 SHIFT_SELECT = """
     *,
-    Clients(client_id, first_name, last_name),
+    Clients(client_id, first_name, last_name, address),
     Users(user_id, first_name, last_name, Caregivers(caregiver_id))
 """
 
@@ -71,12 +71,12 @@ def _first_related(value):
     return None
 
 
-def _format_shift(row: dict) -> dict:
+def _format_shift(row: dict, include_visit: bool = False) -> dict:
     client = _first_related(row.pop("Clients", None)) or {}
     user = _first_related(row.pop("Users", None)) or {}
     caregiver_profile = _first_related(user.get("Caregivers"))
 
-    return {
+    formatted = {
         **row,
         "client_first_name": client.get("first_name"),
         "client_last_name": client.get("last_name"),
@@ -87,6 +87,17 @@ def _format_shift(row: dict) -> dict:
         "caregiver_first_name": user.get("first_name"),
         "caregiver_last_name": user.get("last_name"),
     }
+    if include_visit:
+        from services import shift_activity_service, shift_comment_service
+
+        formatted["address"] = client.get("address")
+        formatted["activities"] = shift_activity_service.list_for_shift(
+            formatted["shift_id"]
+        )
+        formatted["comments"] = shift_comment_service.list_for_shift(
+            formatted["shift_id"]
+        )
+    return formatted
 
 
 def list_shifts(
@@ -372,14 +383,14 @@ def list_shifts_for_caregiver(
     return [_format_shift(dict(row)) for row in result.data]
 
 
-def get_shift_for_caregiver(shift_id: str, current_user):
+def get_shift_for_caregiver(shift_id: str, current_user, include_visit: bool = False):
     row = _get_shift_or_404(shift_id)
     if row.get("caregiver_id") != current_user["user_id"]:
         raise HTTPException(
             status_code=403,
             detail="You are not assigned to this shift",
         )
-    return _format_shift(dict(row))
+    return _format_shift(dict(row), include_visit=include_visit)
 
 
 def list_shifts_for_client(
@@ -398,7 +409,7 @@ def list_shifts_for_client(
     )
 
 
-def get_shift_for_client(shift_id: str, current_user):
+def get_shift_for_client(shift_id: str, current_user, include_visit: bool = False):
     client_id = _get_client_id_for_user(current_user)
     row = _get_shift_or_404(shift_id)
     if row["client_id"] != client_id:
@@ -406,4 +417,4 @@ def get_shift_for_client(shift_id: str, current_user):
             status_code=403,
             detail="You do not have access to this shift",
         )
-    return _format_shift(dict(row))
+    return _format_shift(dict(row), include_visit=include_visit)

@@ -1,3 +1,4 @@
+import httpcore
 import httpx
 from database.supabase import supabase
 from fastapi.security import HTTPBearer
@@ -5,13 +6,18 @@ from fastapi import Depends, HTTPException
 
 security = HTTPBearer()
 
-TRANSIENT_HTTPX = (httpx.TimeoutException, httpx.TransportError)
+TRANSIENT_HTTPX = (
+    httpx.TimeoutException,
+    httpx.TransportError,
+    httpcore.ReadError,
+    httpcore.NetworkError,
+)
 
 
 def service_unavailable():
     return HTTPException(
         status_code=503,
-        detail="Authentication service unavailable",
+        detail="Service temporarily unavailable",
     )
 
 

@@ -1,4 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from auth.dependencies import TRANSIENT_HTTPX
 from routes.admin.activities import router as admin_activities_router
 from routes.admin.assignments import router as admin_assignments_router
 from routes.admin.caregivers import router as admin_caregivers_router
@@ -7,9 +11,19 @@ from routes.admin.shifts import router as admin_shifts_router
 from routes.auth import router as auth_router
 from routes.caregiver.shifts import router as caregiver_shifts_router
 from routes.client.shifts import router as client_shifts_router
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+
+def _service_unavailable_response(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Service temporarily unavailable"},
+    )
+
+
+for _exc_type in TRANSIENT_HTTPX:
+    app.add_exception_handler(_exc_type, _service_unavailable_response)
 
 
 app.add_middleware(

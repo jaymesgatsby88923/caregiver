@@ -41,7 +41,9 @@ def list_my_shifts(
 
 @router.get("/shifts/{shift_id}")
 def get_my_shift(shift_id: str, current_user=Depends(require_caregiver)):
-    return shift_service.get_shift_for_caregiver(shift_id, current_user)
+    return shift_service.get_shift_for_caregiver(
+        shift_id, current_user, include_visit=True
+    )
 
 
 @router.post("/shifts/{shift_id}/clock-in")
