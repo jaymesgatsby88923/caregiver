@@ -4,7 +4,15 @@ import { useAuth } from "@/context/AuthContext";
 export default function ClientLayout() {
   const { user, isLoading } = useAuth();
 
-  if (!isLoading && user?.role !== "client") {
+  if (isLoading) {
+    return null;
+  }
+
+  if (!user) {
+    return <Redirect href="/login" />;
+  }
+
+  if (user.role !== "client") {
     return <Redirect href="/" />;
   }
 

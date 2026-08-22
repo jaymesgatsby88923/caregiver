@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "expo-router";
 import { authToken } from "@/services/api";
 import { authService } from "@/services/authService";
 import type { CurrentUser } from "@/types";
@@ -21,6 +22,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -58,7 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     await authToken.clear();
     setUser(null);
-  }, []);
+    router.replace("/login");
+  }, [router]);
 
   const value = useMemo(
     () => ({ user, isLoading, login, logout }),
