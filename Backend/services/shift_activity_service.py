@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 from fastapi import HTTPException
 
 from database.supabase import supabase
@@ -61,6 +63,44 @@ def _get_active_activity(activity_id: str):
     return activity
 
 
+def _as_utc(value) -> datetime:
+    if isinstance(value, datetime):
+        parsed = value
+    else:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _logged_at_for_shift(logged_at: datetime | None, shift) -> str | None:
+    if logged_at is None:
+        return None
+
+    clock_in = shift.get("actual_start_at")
+    if not clock_in:
+        raise HTTPException(
+            status_code=400,
+            detail="Shift has no clock-in time",
+        )
+
+    event = _as_utc(logged_at)
+    start = _as_utc(clock_in)
+    now = datetime.now(timezone.utc)
+
+    if event < start:
+        raise HTTPException(
+            status_code=400,
+            detail="Activity time must be after clock-in",
+        )
+    if event > now + timedelta(seconds=60):
+        raise HTTPException(
+            status_code=400,
+            detail="Activity time cannot be in the future",
+        )
+    return event.isoformat()
+
+
 def log_for_caregiver(shift_id: str, body: ShiftActivityCreate, current_user):
     shift = shift_service.get_shift_for_caregiver(shift_id, current_user)
     if shift.get("status") != "in_progress":
@@ -71,20 +111,18 @@ def log_for_caregiver(shift_id: str, body: ShiftActivityCreate, current_user):
 
     activity = _get_active_activity(body.activity_id)
     notes = body.notes.strip() if body.notes else None
+    payload = {
+        "shift_id": shift_id,
+        "activity_id": activity["activity_id"],
+        "activity_name": activity["name"],
+        "notes": notes,
+        "logged_by": current_user["user_id"],
+    }
+    logged_at = _logged_at_for_shift(body.logged_at, shift)
+    if logged_at:
+        payload["logged_at"] = logged_at
 
-    result = (
-        supabase.table(TABLE)
-        .insert(
-            {
-                "shift_id": shift_id,
-                "activity_id": activity["activity_id"],
-                "activity_name": activity["name"],
-                "notes": notes,
-                "logged_by": current_user["user_id"],
-            }
-        )
-        .execute()
-    )
+    result = supabase.table(TABLE).insert(payload).execute()
     if not result.data:
         raise HTTPException(status_code=500, detail="Failed to log activity")
     return result.data[0]
