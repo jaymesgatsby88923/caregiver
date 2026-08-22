@@ -5,17 +5,21 @@ import {
   Modal,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
+  useWindowDimensions,
   View,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { caregiverService } from "@/services/caregiverService";
 import { ApiError } from "@/services/api";
 import { AppText } from "@/components/ui/AppText";
 import { Button } from "@/components/ui/Button";
 import { Screen } from "@/components/ui/Screen";
+import { TextField } from "@/components/ui/TextField";
 import { ActivityTimeline } from "@/components/care/ActivityTimeline";
 import { BackHeader } from "@/components/care/BackHeader";
 import { CommentThread } from "@/components/care/CommentThread";
@@ -24,6 +28,7 @@ import { MetaGrid } from "@/components/care/MetaGrid";
 import { colors, radius } from "@/theme/tokens";
 import {
   formatClockTime,
+  formatDateLabel,
   formatTimeRange,
   fullName,
 } from "@/lib/format";
@@ -36,6 +41,8 @@ import type {
 
 export default function CaregiverShiftDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const [shift, setShift] = useState<Shift | null>(null);
   const [activities, setActivities] = useState<ShiftActivity[]>([]);
   const [comments, setComments] = useState<ShiftComment[]>([]);
@@ -45,6 +52,11 @@ export default function CaregiverShiftDetail() {
   const [comment, setComment] = useState("");
   const [sending, setSending] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [draftActivity, setDraftActivity] = useState<CatalogActivity | null>(null);
+  const [draftAt, setDraftAt] = useState(new Date());
+  const [draftNotes, setDraftNotes] = useState("");
+  const [datePart, setDatePart] = useState<"date" | "time" | null>(null);
+  const [savingLog, setSavingLog] = useState(false);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -82,6 +94,40 @@ export default function CaregiverShiftDetail() {
       );
     } finally {
       setBusy(false);
+    }
+  }
+
+  function closePicker() {
+    setPickerOpen(false);
+    setDraftActivity(null);
+    setDraftNotes("");
+    setDatePart(null);
+  }
+
+  function selectActivity(activity: CatalogActivity) {
+    setDraftActivity(activity);
+    setDraftAt(new Date());
+    setDraftNotes("");
+    setDatePart(null);
+  }
+
+  async function saveLog() {
+    if (!shift || !draftActivity) return;
+    setSavingLog(true);
+    try {
+      await caregiverService.logActivity(shift.shift_id, draftActivity.activity_id, {
+        logged_at: draftAt.toISOString(),
+        notes: draftNotes.trim() || undefined,
+      });
+      closePicker();
+      await load();
+    } catch (err) {
+      Alert.alert(
+        "Could not log activity",
+        err instanceof ApiError ? err.message : "Please try again.",
+      );
+    } finally {
+      setSavingLog(false);
     }
   }
 
@@ -190,6 +236,7 @@ export default function CaregiverShiftDetail() {
             label="Log activity"
             variant="secondary"
             onPress={async () => {
+              closePicker();
               setPickerOpen(true);
               if (catalog.length > 0) return;
               try {
@@ -216,28 +263,107 @@ export default function CaregiverShiftDetail() {
       ) : null}
 
       <Modal visible={pickerOpen} animationType="slide" transparent>
-        <Pressable style={styles.overlay} onPress={() => setPickerOpen(false)}>
-          <SafeAreaView style={styles.sheet}>
-            <AppText variant="heading">Log activity</AppText>
-            {catalog.map((activity) => (
-              <Pressable
-                key={activity.activity_id}
-                style={styles.option}
-                onPress={() => {
-                  setPickerOpen(false);
-                  run(() =>
-                    caregiverService.logActivity(shift.shift_id, activity.activity_id),
-                  );
-                }}
-              >
-                <AppText variant="label">{activity.name}</AppText>
-              </Pressable>
-            ))}
-            {catalog.length === 0 ? (
-              <AppText>No active activities in the catalog.</AppText>
-            ) : null}
-          </SafeAreaView>
-        </Pressable>
+        <View style={styles.overlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={closePicker} />
+          <View
+            style={[
+              styles.sheet,
+              {
+                maxHeight: windowHeight * 0.8,
+                paddingBottom: Math.max(insets.bottom, 16),
+              },
+            ]}
+          >
+            {draftActivity ? (
+              <>
+                <Pressable onPress={() => setDraftActivity(null)} hitSlop={8}>
+                  <AppText style={styles.back}>Activities</AppText>
+                </Pressable>
+                <AppText variant="heading">{draftActivity.name}</AppText>
+                <View style={styles.whenRow}>
+                  <Pressable
+                    style={styles.whenField}
+                    onPress={() => setDatePart("date")}
+                  >
+                    <AppText variant="label">Date</AppText>
+                    <AppText>{formatDateLabel(draftAt)}</AppText>
+                  </Pressable>
+                  <Pressable
+                    style={styles.whenField}
+                    onPress={() => setDatePart("time")}
+                  >
+                    <AppText variant="label">Time</AppText>
+                    <AppText>
+                      {formatClockTime(draftAt.toISOString())}
+                    </AppText>
+                  </Pressable>
+                </View>
+                {datePart ? (
+                  <DateTimePicker
+                    value={draftAt}
+                    mode={datePart}
+                    display={Platform.OS === "ios" ? "spinner" : "default"}
+                    onChange={(event, date) => {
+                      const mode = datePart;
+                      if (Platform.OS === "android") setDatePart(null);
+                      if (event.type === "dismissed" || !date) return;
+                      setDraftAt((current) => {
+                        const next = new Date(current);
+                        if (mode === "date") {
+                          next.setFullYear(
+                            date.getFullYear(),
+                            date.getMonth(),
+                            date.getDate(),
+                          );
+                        } else {
+                          next.setHours(date.getHours(), date.getMinutes(), 0, 0);
+                        }
+                        return next;
+                      });
+                    }}
+                  />
+                ) : null}
+                <TextField
+                  label="Notes (optional)"
+                  value={draftNotes}
+                  onChangeText={setDraftNotes}
+                  multiline
+                  style={styles.notes}
+                />
+                <Button
+                  label="Save"
+                  onPress={saveLog}
+                  loading={savingLog}
+                  disabled={savingLog}
+                />
+              </>
+            ) : (
+              <>
+                <AppText variant="heading">Activities</AppText>
+                <ScrollView
+                  style={[
+                    styles.sheetList,
+                    { maxHeight: windowHeight * 0.8 - 96 },
+                  ]}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  {catalog.map((activity) => (
+                    <Pressable
+                      key={activity.activity_id}
+                      style={styles.option}
+                      onPress={() => selectActivity(activity)}
+                    >
+                      <AppText variant="label">{activity.name}</AppText>
+                    </Pressable>
+                  ))}
+                  {catalog.length === 0 ? (
+                    <AppText>No active activities in the catalog.</AppText>
+                  ) : null}
+                </ScrollView>
+              </>
+            )}
+          </View>
+        </View>
       </Modal>
     </KeyboardAvoidingView>
   );
@@ -255,12 +381,37 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingTop: 24,
     gap: 12,
+  },
+  sheetList: {
+    flexGrow: 0,
   },
   option: {
     paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+  },
+  back: {
+    color: colors.navy,
+    fontSize: 14,
+  },
+  whenRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  whenField: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    padding: 12,
+    gap: 4,
+  },
+  notes: {
+    height: 96,
+    paddingTop: 12,
+    textAlignVertical: "top",
   },
 });

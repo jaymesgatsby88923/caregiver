@@ -16,9 +16,15 @@ export const caregiverService = {
   listCatalog: () => api.get<CatalogActivity[]>("/caregiver/activities"),
   listActivities: (id: string) =>
     api.get<ShiftActivity[]>(`/caregiver/shifts/${id}/activities`),
-  logActivity: (id: string, activityId: string) =>
+  logActivity: (
+    id: string,
+    activityId: string,
+    extras?: { logged_at?: string; notes?: string },
+  ) =>
     api.post<ShiftActivity>(`/caregiver/shifts/${id}/activities`, {
       activity_id: activityId,
+      ...(extras?.logged_at ? { logged_at: extras.logged_at } : {}),
+      ...(extras?.notes ? { notes: extras.notes } : {}),
     }),
   deleteActivity: (shiftId: string, activityId: string) =>
     api.delete<void>(`/caregiver/shifts/${shiftId}/activities/${activityId}`),

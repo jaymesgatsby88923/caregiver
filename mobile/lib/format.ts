@@ -48,6 +48,14 @@ export function formatClockTime(value: string | null): string {
   return formatTime(value);
 }
 
+export function formatDateLabel(value: Date): string {
+  return value.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export function statusLabel(status: ShiftStatus): string {
   switch (status) {
     case "in_progress":
