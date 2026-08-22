@@ -53,6 +53,26 @@ export type ShiftStatus =
   | "completed"
   | "cancelled";
 
+export type ShiftActivity = {
+  shift_activity_id: string;
+  shift_id: string;
+  activity_id: string;
+  activity_name: string;
+  notes: string | null;
+  logged_at: string;
+  logged_by: string;
+};
+
+export type ShiftComment = {
+  shift_comment_id: string;
+  shift_id: string;
+  author_user_id: string;
+  author_first_name: string;
+  author_role: UserRole | null;
+  body: string;
+  created_at: string;
+};
+
 export type Shift = {
   shift_id: string;
   client_id: string;
@@ -70,6 +90,9 @@ export type Shift = {
   status: ShiftStatus;
   created_at: string;
   updated_at: string;
+  address?: string | null;
+  activities?: ShiftActivity[];
+  comments?: ShiftComment[];
 };
 
 export type ShiftInput = {

@@ -126,8 +126,8 @@ def list_shifts(
     return [_format_shift(dict(row)) for row in result.data]
 
 
-def get_shift(shift_id: str, current_user):
-    return _format_shift(dict(_get_shift_or_404(shift_id)))
+def get_shift(shift_id: str, current_user, include_visit: bool = False):
+    return _format_shift(dict(_get_shift_or_404(shift_id)), include_visit=include_visit)
 
 
 def create_shift(shift: ShiftCreate, current_user):

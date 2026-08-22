@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import type { CareTeamAssignment, Client, Shift, ShiftStatus } from "@/types";
+import type { CareTeamAssignment, Client, Shift, ShiftActivity, ShiftStatus } from "@/types";
 import { shiftService } from "@/services/shiftService";
 import { clientService } from "@/services/clientService";
 import { caregiverService } from "@/services/caregiverService";
@@ -278,42 +278,218 @@ type DetailModalProps = {
   onClose: () => void;
 };
 
+function formatTime(value: string | null): string {
+  if (!value) return "—";
+  return new Date(value).toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function roleLabel(role: string | null): string {
+  if (!role) return "Staff";
+  return role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function DetailModal({ shift, isOpen, onClose }: DetailModalProps) {
+  const [visit, setVisit] = useState<Shift | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [openNote, setOpenNote] = useState<ShiftActivity | null>(null);
+  const [reply, setReply] = useState("");
+  const [isSending, setIsSending] = useState(false);
+
+  async function loadVisit(shiftId: string) {
+    setIsLoading(true);
+    setError(null);
+    try {
+      setVisit(await shiftService.get(shiftId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load visit details.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!isOpen || !shift) {
+      setVisit(null);
+      setReply("");
+      setOpenNote(null);
+      setError(null);
+      return;
+    }
+    loadVisit(shift.shift_id);
+  }, [isOpen, shift]);
+
+  async function sendReply(event: FormEvent) {
+    event.preventDefault();
+    if (!shift || !reply.trim()) return;
+    setIsSending(true);
+    setError(null);
+    try {
+      await shiftService.addComment(shift.shift_id, reply.trim());
+      setReply("");
+      await loadVisit(shift.shift_id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not post comment.");
+    } finally {
+      setIsSending(false);
+    }
+  }
+
   if (!shift) return null;
 
+  const display = visit ?? shift;
+  const activities = visit?.activities ?? [];
+  const comments = visit?.comments ?? [];
+  const canComment = display.status !== "cancelled";
+
   return (
-    <Modal isOpen={isOpen} title="Shift Detail" onClose={onClose} wide>
-      <div className="space-y-4 text-sm">
-        <div className="flex items-center gap-3">
-          <StatusBadge label={formatStatus(shift.status)} tone={shiftStatusTone(shift.status)} />
-          <span className="text-[var(--text-muted)]">
-            {shift.client_first_name} {shift.client_last_name}
-          </span>
-        </div>
+    <>
+      <Modal isOpen={isOpen} title="Visit" onClose={onClose} wide>
+        {isLoading && !visit ? (
+          <LoadingState />
+        ) : (
+          <div className="space-y-6 text-sm">
+            <div className="flex flex-wrap items-center gap-3">
+              <StatusBadge
+                label={formatStatus(display.status)}
+                tone={shiftStatusTone(display.status)}
+              />
+              <span className="font-medium text-[var(--navy)]">
+                {display.client_first_name} {display.client_last_name}
+              </span>
+            </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border border-[var(--border)] p-4">
-            <h3 className="mb-2 font-semibold text-[var(--navy)]">Scheduled</h3>
-            <p className="m-0">{formatDateTime(shift.scheduled_start_at)}</p>
-            <p className="m-0 text-[var(--text-muted)]">to {formatDateTime(shift.scheduled_end_at)}</p>
-          </div>
-          <div className="rounded-lg border border-[var(--border)] p-4">
-            <h3 className="mb-2 font-semibold text-[var(--navy)]">Actual</h3>
-            <p className="m-0">Start: {formatDateTime(shift.actual_start_at)}</p>
-            <p className="m-0">End: {formatDateTime(shift.actual_end_at)}</p>
-          </div>
-        </div>
+            {error ? (
+              <p className="m-0 rounded-lg bg-[var(--red)]/10 px-3 py-2 text-[var(--red)]">
+                {error}
+              </p>
+            ) : null}
 
-        <div>
-          <h3 className="mb-1 font-semibold text-[var(--navy)]">Caregiver</h3>
-          <p className="m-0">
-            {shift.caregiver_first_name
-              ? `${shift.caregiver_first_name} ${shift.caregiver_last_name}`
-              : "Unassigned (open shift)"}
-          </p>
-        </div>
-      </div>
-    </Modal>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-lg border border-[var(--border)] p-4">
+                <h3 className="mb-2 font-semibold text-[var(--navy)]">Scheduled</h3>
+                <p className="m-0">{formatDateTime(display.scheduled_start_at)}</p>
+                <p className="m-0 text-[var(--text-muted)]">
+                  to {formatDateTime(display.scheduled_end_at)}
+                </p>
+              </div>
+              <div className="rounded-lg border border-[var(--border)] p-4">
+                <h3 className="mb-2 font-semibold text-[var(--navy)]">Actual</h3>
+                <p className="m-0">Start: {formatDateTime(display.actual_start_at)}</p>
+                <p className="m-0">End: {formatDateTime(display.actual_end_at)}</p>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <h3 className="mb-1 font-semibold text-[var(--navy)]">Caregiver</h3>
+                <p className="m-0">
+                  {display.caregiver_first_name
+                    ? `${display.caregiver_first_name} ${display.caregiver_last_name}`
+                    : "Unassigned (open shift)"}
+                </p>
+              </div>
+              <div>
+                <h3 className="mb-1 font-semibold text-[var(--navy)]">Address</h3>
+                <p className="m-0">{display.address || "—"}</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 font-semibold text-[var(--navy)]">Activities</h3>
+              {activities.length === 0 ? (
+                <p className="m-0 text-[var(--text-muted)]">No activities logged yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {activities.map((item) => (
+                    <div
+                      key={item.shift_activity_id}
+                      className="flex items-center gap-3 rounded-lg border border-[var(--border)] px-3 py-2"
+                    >
+                      <span className="w-16 shrink-0 text-[var(--text-muted)]">
+                        {formatTime(item.logged_at)}
+                      </span>
+                      <span className="min-w-0 flex-1 font-medium text-[var(--navy)]">
+                        {item.activity_name}
+                      </span>
+                      {item.notes ? (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="!px-3 !py-1 !text-xs"
+                          onClick={() => setOpenNote(item)}
+                        >
+                          Notes
+                        </Button>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h3 className="mb-3 font-semibold text-[var(--navy)]">Discussion</h3>
+              {comments.length === 0 ? (
+                <p className="m-0 text-[var(--text-muted)]">No comments yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {comments.map((item) => (
+                    <div
+                      key={item.shift_comment_id}
+                      className="rounded-lg border border-[var(--border)] px-3 py-2"
+                    >
+                      <div className="mb-1 flex flex-wrap gap-2 text-xs text-[var(--text-muted)]">
+                        <span className="font-semibold text-[var(--navy)]">
+                          {item.author_first_name}
+                        </span>
+                        <span>{roleLabel(item.author_role)}</span>
+                        <span>{formatDateTime(item.created_at)}</span>
+                      </div>
+                      <p className="m-0 whitespace-pre-wrap">{item.body}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {canComment ? (
+                <form onSubmit={sendReply} className="mt-4 space-y-3">
+                  <textarea
+                    value={reply}
+                    onChange={(e) => setReply(e.target.value)}
+                    rows={3}
+                    placeholder="Reply as the office..."
+                    className="w-full rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm outline-none focus:border-[var(--navy)]"
+                  />
+                  <div className="flex justify-end">
+                    <Button type="submit" disabled={isSending || !reply.trim()}>
+                      {isSending ? "Sending..." : "Post comment"}
+                    </Button>
+                  </div>
+                </form>
+              ) : (
+                <p className="mt-3 m-0 text-[var(--text-muted)]">
+                  Comments cannot be added on a cancelled shift.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        isOpen={Boolean(openNote)}
+        title={openNote?.activity_name ?? "Notes"}
+        onClose={() => setOpenNote(null)}
+      >
+        <p className="mt-0 text-sm text-[var(--text-muted)]">
+          {openNote ? formatTime(openNote.logged_at) : ""}
+        </p>
+        <p className="whitespace-pre-wrap text-sm">{openNote?.notes}</p>
+      </Modal>
+    </>
   );
 }
 

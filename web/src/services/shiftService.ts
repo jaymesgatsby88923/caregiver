@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { Shift, ShiftInput, ShiftUpdateInput } from "@/types";
+import type { Shift, ShiftComment, ShiftInput, ShiftUpdateInput } from "@/types";
 
 export type ShiftListParams = {
   status?: string;
@@ -26,6 +26,9 @@ export const shiftService = {
     api.get<Shift[]>(`/admin/shifts${buildQuery(params)}`),
 
   get: (id: string) => api.get<Shift>(`/admin/shifts/${id}`),
+
+  addComment: (id: string, body: string) =>
+    api.post<ShiftComment>(`/admin/shifts/${id}/comments`, { body }),
 
   create: (data: ShiftInput) => api.post<Shift>("/admin/shifts", data),
 

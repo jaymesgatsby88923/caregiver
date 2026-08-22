@@ -30,7 +30,7 @@ def list_shifts(
 
 @router.get("/shifts/{shift_id}")
 def get_shift(shift_id: str, current_user=Depends(require_admin)):
-    return shift_service.get_shift(shift_id, current_user)
+    return shift_service.get_shift(shift_id, current_user, include_visit=True)
 
 
 @router.post("/shifts")
