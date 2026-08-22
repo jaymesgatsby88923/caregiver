@@ -1,3 +1,6 @@
+from fastapi import HTTPException
+
+from auth.provision import delete_app_user, delete_auth_user, provision_login
 from database.supabase import supabase
 from models.caregiver import CaregiverCreate, CaregiverUpdate
 
@@ -88,52 +91,33 @@ def caregiver_fields_update(caregiver_id,caregiver: CaregiverUpdate):
     )                
     
 
-
-#Add
-
 def add_caregiver(caregiver: CaregiverCreate):
-    
-    user = user_fields_add(caregiver)
-    caregiver_fields_add(caregiver,user)
-    
-    
-   
-
-  
-
-def user_fields_add(caregiver: CaregiverCreate):
-      user_id ="" 
-
-      response = (
-        supabase.table("Users")
-        .insert(
-            {
-         "first_name":caregiver.first_name,
-         "last_name":caregiver.last_name,
-         "phone":caregiver.phone,
-         "email":caregiver.email,
-         "role":"caregiver",
-         "auth_user_id":caregiver.email
-            }
+    auth_user_id, user_id = provision_login(
+        email=caregiver.email,
+        first_name=caregiver.first_name,
+        last_name=caregiver.last_name,
+        phone=caregiver.phone,
+        role="caregiver",
+    )
+    try:
+        result = (
+            supabase.table("Caregivers")
+            .insert(
+                {
+                    "rate": caregiver.rate,
+                    "user_id": user_id,
+                }
+            )
+            .execute()
         )
-        .execute()
-        )   
-      return response.data[0]["user_id"]
-    
+        if not result.data:
+            raise HTTPException(status_code=500, detail="Failed to create caregiver")
+        return result.data
+    except Exception:
+        delete_app_user(user_id)
+        delete_auth_user(auth_user_id)
+        raise
 
-def caregiver_fields_add(caregiver: CaregiverCreate,user_id):
-      response = (
-        supabase.table("Caregivers")
-        .insert(
-            {
-        
-          "rate":caregiver.rate,
-          "user_id":user_id
-            }
-        )
-        .execute()
-    )                
-    
 
 def delete_caregiver(caregiver_id: str):
 

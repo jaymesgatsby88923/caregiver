@@ -1,9 +1,8 @@
-import os
-
 from database.supabase import SUPABASE_KEY, SUPABASE_URL, supabase
 from fastapi import HTTPException
 from supabase import create_client
 from auth.dependencies import TRANSIENT_HTTPX, service_unavailable
+from auth.provision import reset_redirect_url
 from models.auth import (
     ForgotPasswordRequest,
     LoginRequest,
@@ -62,19 +61,12 @@ def login(login_request: LoginRequest):
     }
 
 
-def _reset_redirect_url() -> str:
-    return os.getenv(
-        "PASSWORD_RESET_REDIRECT_URL",
-        "https://caringangels.io/reset-password",
-    )
-
-
 def forgot_password(body: ForgotPasswordRequest):
     # Always succeed so the response does not reveal whether the email exists.
     try:
         supabase.auth.reset_password_for_email(
             body.email,
-            {"redirect_to": _reset_redirect_url()},
+            {"redirect_to": reset_redirect_url()},
         )
     except Exception:
         pass

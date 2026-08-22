@@ -1,6 +1,4 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi.security import HTTPBearer
+from fastapi import APIRouter, Depends, HTTPException
 from auth import auth_service
 from models.auth import (
     ForgotPasswordRequest,
@@ -26,7 +24,7 @@ def login(login_request: LoginRequest):
 
 @router.post("/signup")
 def signup(signup_request: SignUpRequest):
-    return auth_service.signup(signup_request)
+    raise HTTPException(status_code=403, detail="Account creation is admin-only")
 
 @router.get("/current-user")
 def current_user(current_user = Depends(get_current_user)):

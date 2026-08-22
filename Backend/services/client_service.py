@@ -1,3 +1,4 @@
+from auth.provision import delete_app_user, delete_auth_user, provision_login
 from database.supabase import supabase
 from fastapi import HTTPException
 from models.client import ClientCreate, ClientUpdate
@@ -33,26 +34,37 @@ def update_client(client_id,client: ClientUpdate,current_user):
 )   
     return result.data
 
-def add_client(client: ClientCreate,current_user):
-   
-
-    response = (
-        supabase.table("Clients")
-        .insert(
-            {
-        "first_name": client.first_name,
-        "last_name":client.last_name,
-        "billing_rate":client.billing_rate,
-        "phone":client.phone,
-        "email":client.email,
-        "address":client.address,
-        "notes":client.notes
-            }
-        )
-        .execute()
+def add_client(client: ClientCreate, current_user):
+    auth_user_id, user_id = provision_login(
+        email=client.email,
+        first_name=client.first_name,
+        last_name=client.last_name,
+        phone=client.phone,
+        role="client",
     )
-
-    return response.data
+    try:
+        response = (
+            supabase.table("Clients")
+            .insert(
+                {
+                    "first_name": client.first_name,
+                    "last_name": client.last_name,
+                    "billing_rate": client.billing_rate,
+                    "phone": client.phone,
+                    "email": client.email,
+                    "address": client.address,
+                    "notes": client.notes,
+                }
+            )
+            .execute()
+        )
+        if not response.data:
+            raise HTTPException(status_code=500, detail="Failed to create client")
+        return response.data
+    except Exception:
+        delete_app_user(user_id)
+        delete_auth_user(auth_user_id)
+        raise
 
 def delete_client(client_id: str):
 

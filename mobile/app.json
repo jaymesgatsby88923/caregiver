@@ -4,7 +4,7 @@
     "slug": "careapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Caring_Angels_Logo_App.png",
     "scheme": "careapp",
     "userInterfaceStyle": "light",
     "ios": {
